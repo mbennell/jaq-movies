@@ -13,10 +13,42 @@ interface GlassProps {
 }
 
 const glassVariants = {
-  default: 'glass',
-  card: 'glass-card p-6',
-  navigation: 'glass px-4 py-2',
-  modal: 'glass p-8'
+  default: {
+    className: 'rounded-2xl border border-white/20',
+    style: {
+      background: 'rgba(0, 0, 0, 0.2)',
+      backdropFilter: 'blur(20px)',
+      WebkitBackdropFilter: 'blur(20px)',
+      boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)'
+    }
+  },
+  card: {
+    className: 'p-6 rounded-2xl border border-white/20 transition-all duration-300 hover:bg-black/40 hover:-translate-y-0.5',
+    style: {
+      background: 'rgba(0, 0, 0, 0.3)',
+      backdropFilter: 'blur(20px)',
+      WebkitBackdropFilter: 'blur(20px)',
+      boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)'
+    }
+  },
+  navigation: {
+    className: 'px-4 py-2 rounded-2xl border border-white/20',
+    style: {
+      background: 'rgba(0, 0, 0, 0.2)',
+      backdropFilter: 'blur(20px)',
+      WebkitBackdropFilter: 'blur(20px)',
+      boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)'
+    }
+  },
+  modal: {
+    className: 'p-8 rounded-2xl border border-white/20',
+    style: {
+      background: 'rgba(0, 0, 0, 0.2)',
+      backdropFilter: 'blur(20px)',
+      WebkitBackdropFilter: 'blur(20px)',
+      boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)'
+    }
+  }
 }
 
 const animationVariants = {
@@ -45,9 +77,12 @@ export default function Glass({
     transition: { duration: 0.3 }
   } : {}
 
+  const variantConfig = glassVariants[variant]
+  
   return (
     <Component
-      className={cn(glassVariants[variant], className)}
+      className={cn(variantConfig.className, className)}
+      style={variantConfig.style}
       {...motionProps}
     >
       {children}

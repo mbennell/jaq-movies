@@ -121,8 +121,12 @@
 }
 
 @keyframes glow {
-  0%, 100% { box-shadow: 0 0 20px var(--cinema-gold); }
-  50% { box-shadow: 0 0 40px var(--cinema-gold), 0 0 60px var(--cinema-gold); }
+  0%, 100% { 
+    text-shadow: 0 0 20px #d4af37, 0 0 40px #d4af37;
+  }
+  50% { 
+    text-shadow: 0 0 30px #d4af37, 0 0 60px #d4af37, 0 0 80px #d4af37;
+  }
 }
 
 @keyframes fadeInUp {

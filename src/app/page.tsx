@@ -23,17 +23,33 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-cinema-black film-grain relative overflow-hidden">
+    <main className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#0a0a0f' }}>
       {/* Background Effects */}
-      <div className="absolute inset-0 bg-gradient-to-br from-cinema-black via-cinema-dark to-cinema-black" />
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-cinema-gold/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-cinema-blue/5 rounded-full blur-3xl" />
+      <div className="absolute inset-0" style={{ 
+        background: 'linear-gradient(135deg, #0a0a0f 0%, #1a1a1f 50%, #0a0a0f 100%)' 
+      }} />
+      <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full blur-3xl" style={{ 
+        backgroundColor: 'rgba(212, 175, 55, 0.05)' 
+      }} />
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full blur-3xl" style={{ 
+        backgroundColor: 'rgba(0, 212, 255, 0.05)' 
+      }} />
+      
+      {/* Film Grain Effect */}
+      <div className="absolute inset-0 opacity-40 pointer-events-none" style={{
+        backgroundImage: `
+          radial-gradient(circle, transparent 20%, rgba(255,255,255,.03) 21%, rgba(255,255,255,.03) 25%, transparent 26%),
+          linear-gradient(0deg, transparent 24%, rgba(255,255,255,.05) 25%, rgba(255,255,255,.05) 26%, transparent 27%, transparent 74%, rgba(255,255,255,.05) 75%, rgba(255,255,255,.05) 76%, transparent 77%, transparent)
+        `,
+        backgroundSize: '3px 3px'
+      }} />
       
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 p-6">
         <Glass variant="navigation" className="flex justify-between items-center max-w-7xl mx-auto">
           <motion.h1 
-            className="text-2xl font-bold text-cinema-gold font-heading"
+            className="text-2xl font-bold font-heading"
+            style={{ color: '#d4af37' }}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
@@ -64,11 +80,15 @@ export default function Home() {
           >
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 font-heading">
               <span className="text-white">The </span>
-              <span className="text-cinema-gold cinema-glow">Best Ever</span>
+              <span style={{ 
+                color: '#d4af37',
+                textShadow: '0 0 20px #d4af37, 0 0 40px #d4af37, 0 0 60px #d4af37',
+                animation: 'glow 2s ease-in-out infinite alternate'
+              }}>Best Ever</span>
               <br />
               <span className="text-white">Movie Guide</span>
             </h1>
-            <p className="text-xl md:text-2xl text-cinema-silver max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed" style={{ color: '#c0c0c0' }}>
               Your personal AI-powered cinema companion for discovering, sharing, and discussing the world&apos;s greatest films
             </p>
           </motion.div>
@@ -133,15 +153,15 @@ export default function Home() {
           >
             <span className="text-white">Cinema Magic</span>
             <br />
-            <span className="text-cinema-gold">At Your Fingertips</span>
+            <span style={{ color: '#d4af37' }}>At Your Fingertips</span>
           </motion.h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <motion.div variants={itemVariants}>
               <Card hover className="h-full p-6 text-center">
                 <div className="text-4xl mb-4">🎤</div>
-                <h3 className="text-xl font-semibold mb-3 text-cinema-gold">Voice Recommendations</h3>
-                <p className="text-cinema-silver">
+                <h3 className="text-xl font-semibold mb-3" style={{ color: '#d4af37' }}>Voice Recommendations</h3>
+                <p style={{ color: '#c0c0c0' }}>
                   Simply speak your movie recommendation and let AI handle the rest
                 </p>
               </Card>
@@ -150,8 +170,8 @@ export default function Home() {
             <motion.div variants={itemVariants}>
               <Card hover className="h-full p-6 text-center">
                 <div className="text-4xl mb-4">🤖</div>
-                <h3 className="text-xl font-semibold mb-3 text-cinema-gold">AI Research</h3>
-                <p className="text-cinema-silver">
+                <h3 className="text-xl font-semibold mb-3" style={{ color: '#d4af37' }}>AI Research</h3>
+                <p style={{ color: '#c0c0c0' }}>
                   Automatic movie details, ratings, and streaming availability
                 </p>
               </Card>
@@ -160,8 +180,8 @@ export default function Home() {
             <motion.div variants={itemVariants}>
               <Card hover className="h-full p-6 text-center">
                 <div className="text-4xl mb-4">👥</div>
-                <h3 className="text-xl font-semibold mb-3 text-cinema-gold">Social Discovery</h3>
-                <p className="text-cinema-silver">
+                <h3 className="text-xl font-semibold mb-3" style={{ color: '#d4af37' }}>Social Discovery</h3>
+                <p style={{ color: '#c0c0c0' }}>
                   Connect with friends and discover new movies together
                 </p>
               </Card>
@@ -170,8 +190,8 @@ export default function Home() {
             <motion.div variants={itemVariants}>
               <Card hover className="h-full p-6 text-center">
                 <div className="text-4xl mb-4">🔍</div>
-                <h3 className="text-xl font-semibold mb-3 text-cinema-gold">Smart Curation</h3>
-                <p className="text-cinema-silver">
+                <h3 className="text-xl font-semibold mb-3" style={{ color: '#d4af37' }}>Smart Curation</h3>
+                <p style={{ color: '#c0c0c0' }}>
                   Find movies based on mood, genre, and personal preferences
                 </p>
               </Card>
@@ -192,7 +212,7 @@ export default function Home() {
             <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white font-heading">
               Ready to discover your next favorite film?
             </h2>
-            <p className="text-xl text-cinema-silver mb-8">
+            <p className="text-xl mb-8" style={{ color: '#c0c0c0' }}>
               Join the ultimate movie community and never run out of great films to watch
             </p>
             <Button size="lg" className="text-lg px-12 py-4">
