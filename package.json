@@ -4,9 +4,10 @@
   "description": "Social movie recommendation platform with AI-powered features",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "postinstall": "prisma generate"
   },
   "keywords": [
     "movies",

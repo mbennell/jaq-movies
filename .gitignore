@@ -75,3 +75,4 @@ Thumbs.db
 
 # Prisma
 /generated/prisma
+.vercel
