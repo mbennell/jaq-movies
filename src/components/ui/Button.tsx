@@ -16,30 +16,35 @@ interface ButtonProps {
 
 const buttonVariants = {
   primary: {
-    className: 'text-black font-semibold transition-all duration-300 hover:scale-105',
+    className: 'text-black font-semibold transition-all duration-300 hover:scale-105 shadow-lg',
     style: {
-      background: 'linear-gradient(90deg, #d4af37 0%, #f4d03f 100%)'
+      background: 'linear-gradient(90deg, #d4af37 0%, #f4d03f 100%)',
+      boxShadow: '0 4px 15px rgba(212, 175, 55, 0.3)'
     }
   },
   secondary: {
-    className: 'text-white hover:opacity-80 transition-all duration-300',
+    className: 'text-white hover:opacity-80 transition-all duration-300 shadow-lg',
     style: {
-      backgroundColor: '#8b1538'
+      backgroundColor: '#8b1538',
+      boxShadow: '0 4px 15px rgba(139, 21, 56, 0.3)'
     }
   },
   glass: {
-    className: 'text-white hover:opacity-80 transition-all duration-300 border border-white/20',
+    className: 'text-white hover:opacity-80 transition-all duration-300 border shadow-lg',
     style: {
-      background: 'rgba(0, 0, 0, 0.2)',
+      background: 'rgba(0, 0, 0, 0.4)',
       backdropFilter: 'blur(20px)',
-      WebkitBackdropFilter: 'blur(20px)'
+      WebkitBackdropFilter: 'blur(20px)',
+      borderColor: 'rgba(255, 255, 255, 0.2)',
+      boxShadow: '0 4px 15px rgba(0, 0, 0, 0.3)'
     }
   },
   ghost: {
-    className: 'bg-transparent border transition-all duration-300 hover:text-black',
+    className: 'bg-transparent border transition-all duration-300 hover:shadow-lg',
     style: {
       color: '#d4af37',
-      borderColor: '#d4af37'
+      borderColor: '#d4af37',
+      boxShadow: '0 2px 10px rgba(212, 175, 55, 0.2)'
     }
   }
 }

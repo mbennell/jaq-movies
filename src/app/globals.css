@@ -142,9 +142,19 @@
 
 
 /* Body and Base Styles */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
 body {
-  color: var(--foreground);
-  background: var(--background);
+  color: #ffffff !important;
+  background: #0a0a0f !important;
   font-family: var(--font-body);
   overflow-x: hidden;
 }

@@ -16,8 +16,26 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <html 
+      lang="en"
+      style={{
+        margin: 0,
+        padding: 0,
+        height: '100%'
+      }}
+    >
+      <body 
+        className={inter.className}
+        style={{
+          margin: 0,
+          padding: 0,
+          backgroundColor: '#0a0a0f',
+          color: '#ffffff',
+          overflowX: 'hidden',
+          minHeight: '100vh',
+          fontFamily: 'Inter, system-ui, sans-serif'
+        }}
+      >
         <Providers>
           {children}
         </Providers>
