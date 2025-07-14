@@ -1,6 +1,6 @@
-# Jaq Movie Social
+# 🎬 Jaq's Best Ever Movie Guide
 
-A social movie recommendation platform with AI-powered features.
+Your personal AI-powered cinema companion for discovering, sharing, and discussing the world's greatest films.
 
 ## Features
 

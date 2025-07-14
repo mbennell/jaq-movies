@@ -6,8 +6,8 @@ import Providers from '@/components/providers/SessionProvider'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Jaq Movie Social',
-  description: 'Social movie recommendation platform with AI-powered features',
+  title: "Jaq's Best Ever Movie Guide",
+  description: "Your personal AI-powered cinema companion for discovering, sharing, and discussing the world's greatest films",
 }
 
 export default function RootLayout({
