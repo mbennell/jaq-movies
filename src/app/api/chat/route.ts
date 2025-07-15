@@ -143,7 +143,7 @@ export async function POST(request: NextRequest) {
     const movieTitle = extractMovieTitle(message);
     
     // Generate response
-    const response = await generateResponse(intent, message, movieTitle);
+    const response = await generateResponse(intent, message, movieTitle || undefined);
     
     // Store conversation
     await prisma.conversation.create({
