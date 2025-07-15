@@ -22,6 +22,13 @@ model Movie {
   rottenTomatoes Int?
   streamingServices String[]
   type          MediaType @default(MOVIE)
+  
+  // AI-generated tags and metadata
+  aiTags        String[] @default([])  // AI-generated semantic tags
+  moodTags      String[] @default([])  // Emotional/atmospheric tags
+  contextTags   String[] @default([])  // Viewing context tags
+  complexity    Int?                   // Viewing complexity score 1-5
+  
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -54,6 +61,8 @@ model Conversation {
   intent    ConversationIntent
   response  String   // AI response
   movieId   String?  // If related to a specific movie
+  threadId  String?  // OpenAI thread ID for conversation continuity
+  userId    String?  // User identifier for multi-user support
   createdAt DateTime @default(now())
 
   movie     Movie?   @relation(fields: [movieId], references: [id])

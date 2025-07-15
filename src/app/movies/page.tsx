@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { 
   Button, 
@@ -35,6 +35,24 @@ export default function MoviesPage() {
   const [recommendation, setRecommendation] = useState('')
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null)
   const { isOpen, onOpen, onClose } = useDisclosure()
+
+  // Load existing movies on component mount
+  const loadMovies = async () => {
+    try {
+      const response = await fetch('/api/movies')
+      if (response.ok) {
+        const data = await response.json()
+        setMovies(data.results || [])
+      }
+    } catch (error) {
+      console.error('Failed to load movies:', error)
+    }
+  }
+
+  // Load movies when component mounts
+  useEffect(() => {
+    loadMovies()
+  }, [])
 
   const searchMovies = async (query: string) => {
     if (!query.trim()) {

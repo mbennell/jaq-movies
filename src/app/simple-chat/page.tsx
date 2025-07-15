@@ -27,7 +27,7 @@ export default function SimpleChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       type: 'ai',
-      content: "Hi! I'm here to help with movie recommendations. You can tell me what you just watched, or ask me what you should watch next!",
+      content: "Hi! I'm here to help with movie recommendations. You can tell me what you just watched, or ask me what you should watch next! 🎬",
       timestamp: new Date()
     }
   ])
@@ -49,15 +49,18 @@ export default function SimpleChatPage() {
     setIsLoading(true)
 
     try {
-      const response = await fetch('/api/chat', {
+      const response = await fetch('/api/assistant/simple', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: input }),
+        body: JSON.stringify({ 
+          message: input
+        }),
       })
 
       const data = await response.json()
+
 
       const aiMessage: ChatMessage = {
         type: 'ai',
