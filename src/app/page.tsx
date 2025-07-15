@@ -1,7 +1,6 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import SignIn from '@/components/auth/SignIn'
 import Glass from '@/components/ui/Glass'
 import Button from '@/components/ui/Button'
 import Card from '@/components/ui/Card'
@@ -61,7 +60,9 @@ export default function Home() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <SignIn />
+            <Button variant="ghost" size="md">
+              🎬 Start Exploring
+            </Button>
           </motion.div>
         </Glass>
       </nav>
