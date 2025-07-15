@@ -2,8 +2,11 @@
 
 import { motion } from 'framer-motion'
 import { Button, Card, CardBody, Navbar, NavbarBrand, NavbarContent, NavbarItem, Chip } from '@heroui/react'
+import { useRouter } from 'next/navigation'
 
 export default function Home() {
+  const router = useRouter()
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -49,7 +52,11 @@ export default function Home() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <Button color="primary" variant="ghost">
+              <Button 
+                color="primary" 
+                variant="ghost"
+                onClick={() => router.push('/movies')}
+              >
                 Start Exploring
               </Button>
             </motion.div>
@@ -85,16 +92,9 @@ export default function Home() {
               size="lg" 
               color="primary"
               className="text-lg px-8 py-4 font-semibold"
+              onClick={() => router.push('/movies')}
             >
               🎬 Start Discovering
-            </Button>
-            <Button 
-              size="lg" 
-              color="success"
-              variant="bordered"
-              className="text-lg px-8 py-4 font-semibold"
-            >
-              🎤 Voice Recommendations
             </Button>
           </motion.div>
 
@@ -149,19 +149,7 @@ export default function Home() {
             <span className="text-primary">At Your Fingertips</span>
           </motion.h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <motion.div variants={itemVariants}>
-              <Card className="h-full bg-background/40 backdrop-blur-md border-primary/20 hover:border-primary/40 transition-all duration-300">
-                <CardBody className="text-center p-6">
-                  <div className="text-4xl mb-4">🎤</div>
-                  <h3 className="text-xl font-semibold mb-3 text-primary">Voice Recommendations</h3>
-                  <p className="text-foreground/70">
-                    Simply speak your movie recommendation and let AI handle the rest
-                  </p>
-                </CardBody>
-              </Card>
-            </motion.div>
-
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <motion.div variants={itemVariants}>
               <Card className="h-full bg-background/40 backdrop-blur-md border-success/20 hover:border-success/40 transition-all duration-300">
                 <CardBody className="text-center p-6">
@@ -222,6 +210,7 @@ export default function Home() {
                   size="lg" 
                   color="primary"
                   className="text-lg px-12 py-4 font-semibold"
+                  onClick={() => router.push('/movies')}
                 >
                   Get Started Free 🎬
                 </Button>
