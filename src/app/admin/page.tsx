@@ -35,7 +35,7 @@ export default function AdminPage() {
         setImportStatus('error')
         setImportResults(result)
       }
-    } catch (_) {
+    } catch {
       setImportStatus('error')
       setImportResults({ error: 'Failed to import' })
     }
