@@ -1,9 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import Glass from '@/components/ui/Glass'
-import Button from '@/components/ui/Button'
-import Card from '@/components/ui/Card'
+import { Button, Card, CardBody, Navbar, NavbarBrand, NavbarContent, NavbarItem, Chip } from '@heroui/react'
 
 export default function Home() {
   const containerVariants = {
@@ -22,75 +20,60 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#0a0a0f' }}>
+    <div className="min-h-screen bg-background text-foreground">
       {/* Background Effects */}
-      <div className="absolute inset-0" style={{ 
-        background: 'linear-gradient(135deg, #0a0a0f 0%, #1a1a1f 50%, #0a0a0f 100%)' 
-      }} />
-      <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full blur-3xl" style={{ 
-        backgroundColor: 'rgba(212, 175, 55, 0.05)' 
-      }} />
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full blur-3xl" style={{ 
-        backgroundColor: 'rgba(0, 212, 255, 0.05)' 
-      }} />
+      <div className="fixed inset-0 bg-gradient-to-br from-background via-background/90 to-background" />
+      <div className="fixed top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+      <div className="fixed bottom-0 right-1/4 w-96 h-96 bg-success/5 rounded-full blur-3xl" />
       
       {/* Film Grain Effect */}
-      <div className="absolute inset-0 opacity-40 pointer-events-none" style={{
-        backgroundImage: `
-          radial-gradient(circle, transparent 20%, rgba(255,255,255,.03) 21%, rgba(255,255,255,.03) 25%, transparent 26%),
-          linear-gradient(0deg, transparent 24%, rgba(255,255,255,.05) 25%, rgba(255,255,255,.05) 26%, transparent 27%, transparent 74%, rgba(255,255,255,.05) 75%, rgba(255,255,255,.05) 76%, transparent 77%, transparent)
-        `,
-        backgroundSize: '3px 3px'
-      }} />
+      <div className="fixed inset-0 opacity-20 pointer-events-none film-grain" />
       
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 p-6">
-        <Glass variant="navigation" className="flex justify-between items-center max-w-7xl mx-auto">
-          <motion.h1 
-            className="text-2xl font-bold font-heading"
-            style={{ color: '#d4af37' }}
+      <Navbar className="backdrop-blur-md bg-background/40" maxWidth="full">
+        <NavbarBrand>
+          <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
-            Jaq&apos;s Best Ever Movie Guide
-          </motion.h1>
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <Button variant="ghost" size="md">
-              🎬 Start Exploring
-            </Button>
+            <h1 className="text-2xl font-bold text-primary cinema-glow">
+              🎬 Jaq's Best Ever Movie Guide
+            </h1>
           </motion.div>
-        </Glass>
-      </nav>
+        </NavbarBrand>
+        <NavbarContent justify="end">
+          <NavbarItem>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Button color="primary" variant="ghost">
+                Start Exploring
+              </Button>
+            </motion.div>
+          </NavbarItem>
+        </NavbarContent>
+      </Navbar>
 
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center px-6 pt-24">
         <motion.div 
-          className="text-center max-w-6xl mx-auto"
+          className="text-center max-w-6xl mx-auto z-10"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
         >
-          <motion.div
-            variants={itemVariants}
-            className="mb-8"
-          >
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 font-heading">
-              <span className="text-white">The </span>
-              <span style={{ 
-                color: '#d4af37',
-                textShadow: '0 0 20px #d4af37, 0 0 40px #d4af37, 0 0 60px #d4af37',
-                animation: 'glow 2s ease-in-out infinite alternate'
-              }}>Best Ever</span>
+          <motion.div variants={itemVariants} className="mb-8">
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6">
+              <span className="text-foreground">The </span>
+              <span className="text-primary cinema-glow">Best Ever</span>
               <br />
-              <span className="text-white">Movie Guide</span>
+              <span className="text-foreground">Movie Guide</span>
             </h1>
-            <p className="text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed" style={{ color: '#c0c0c0' }}>
-              Your personal AI-powered cinema companion for discovering, sharing, and discussing the world&apos;s greatest films
+            <p className="text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed text-foreground/80">
+              Your personal AI-powered cinema companion for discovering, sharing, and discussing the world's greatest films
             </p>
           </motion.div>
 
@@ -98,10 +81,19 @@ export default function Home() {
             variants={itemVariants}
             className="flex flex-col sm:flex-row gap-4 justify-center mb-16"
           >
-            <Button size="lg" className="text-lg px-8 py-4">
+            <Button 
+              size="lg" 
+              color="primary"
+              className="text-lg px-8 py-4 font-semibold"
+            >
               🎬 Start Discovering
             </Button>
-            <Button variant="ghost" size="lg" className="text-lg px-8 py-4">
+            <Button 
+              size="lg" 
+              color="success"
+              variant="bordered"
+              className="text-lg px-8 py-4 font-semibold"
+            >
               🎤 Voice Recommendations
             </Button>
           </motion.div>
@@ -140,7 +132,7 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="py-24 px-6 relative">
+      <section className="py-24 px-6 relative z-10">
         <motion.div 
           className="max-w-7xl mx-auto"
           variants={containerVariants}
@@ -150,51 +142,59 @@ export default function Home() {
         >
           <motion.h2 
             variants={itemVariants}
-            className="text-4xl md:text-5xl font-bold text-center mb-16 font-heading"
+            className="text-4xl md:text-5xl font-bold text-center mb-16"
           >
-            <span className="text-white">Cinema Magic</span>
+            <span className="text-foreground">Cinema Magic</span>
             <br />
-            <span style={{ color: '#d4af37' }}>At Your Fingertips</span>
+            <span className="text-primary">At Your Fingertips</span>
           </motion.h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <motion.div variants={itemVariants}>
-              <Card hover className="h-full p-6 text-center">
-                <div className="text-4xl mb-4">🎤</div>
-                <h3 className="text-xl font-semibold mb-3" style={{ color: '#d4af37' }}>Voice Recommendations</h3>
-                <p style={{ color: '#c0c0c0' }}>
-                  Simply speak your movie recommendation and let AI handle the rest
-                </p>
+              <Card className="h-full bg-background/40 backdrop-blur-md border-primary/20 hover:border-primary/40 transition-all duration-300">
+                <CardBody className="text-center p-6">
+                  <div className="text-4xl mb-4">🎤</div>
+                  <h3 className="text-xl font-semibold mb-3 text-primary">Voice Recommendations</h3>
+                  <p className="text-foreground/70">
+                    Simply speak your movie recommendation and let AI handle the rest
+                  </p>
+                </CardBody>
               </Card>
             </motion.div>
 
             <motion.div variants={itemVariants}>
-              <Card hover className="h-full p-6 text-center">
-                <div className="text-4xl mb-4">🤖</div>
-                <h3 className="text-xl font-semibold mb-3" style={{ color: '#d4af37' }}>AI Research</h3>
-                <p style={{ color: '#c0c0c0' }}>
-                  Automatic movie details, ratings, and streaming availability
-                </p>
+              <Card className="h-full bg-background/40 backdrop-blur-md border-success/20 hover:border-success/40 transition-all duration-300">
+                <CardBody className="text-center p-6">
+                  <div className="text-4xl mb-4">🤖</div>
+                  <h3 className="text-xl font-semibold mb-3 text-success">AI Research</h3>
+                  <p className="text-foreground/70">
+                    Automatic movie details, ratings, and streaming availability
+                  </p>
+                </CardBody>
               </Card>
             </motion.div>
 
             <motion.div variants={itemVariants}>
-              <Card hover className="h-full p-6 text-center">
-                <div className="text-4xl mb-4">👥</div>
-                <h3 className="text-xl font-semibold mb-3" style={{ color: '#d4af37' }}>Social Discovery</h3>
-                <p style={{ color: '#c0c0c0' }}>
-                  Connect with friends and discover new movies together
-                </p>
+              <Card className="h-full bg-background/40 backdrop-blur-md border-secondary/20 hover:border-secondary/40 transition-all duration-300">
+                <CardBody className="text-center p-6">
+                  <div className="text-4xl mb-4">👥</div>
+                  <h3 className="text-xl font-semibold mb-3 text-secondary">Social Discovery</h3>
+                  <p className="text-foreground/70">
+                    Connect with friends and discover new movies together
+                  </p>
+                </CardBody>
               </Card>
             </motion.div>
 
             <motion.div variants={itemVariants}>
-              <Card hover className="h-full p-6 text-center">
-                <div className="text-4xl mb-4">🔍</div>
-                <h3 className="text-xl font-semibold mb-3" style={{ color: '#d4af37' }}>Smart Curation</h3>
-                <p style={{ color: '#c0c0c0' }}>
-                  Find movies based on mood, genre, and personal preferences
-                </p>
+              <Card className="h-full bg-background/40 backdrop-blur-md border-warning/20 hover:border-warning/40 transition-all duration-300">
+                <CardBody className="text-center p-6">
+                  <div className="text-4xl mb-4">🔍</div>
+                  <h3 className="text-xl font-semibold mb-3 text-warning">Smart Curation</h3>
+                  <p className="text-foreground/70">
+                    Find movies based on mood, genre, and personal preferences
+                  </p>
+                </CardBody>
               </Card>
             </motion.div>
           </div>
@@ -202,26 +202,41 @@ export default function Home() {
       </section>
 
       {/* Call to Action */}
-      <section className="py-24 px-6 relative">
-        <Glass className="max-w-4xl mx-auto text-center p-12">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white font-heading">
-              Ready to discover your next favorite film?
-            </h2>
-            <p className="text-xl mb-8" style={{ color: '#c0c0c0' }}>
-              Join the ultimate movie community and never run out of great films to watch
-            </p>
-            <Button size="lg" className="text-lg px-12 py-4">
-              Get Started Free 🎬
-            </Button>
-          </motion.div>
-        </Glass>
+      <section className="py-24 px-6 relative z-10">
+        <Card className="max-w-4xl mx-auto bg-background/60 backdrop-blur-md border-primary/30">
+          <CardBody className="text-center p-12">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <h2 className="text-3xl md:text-4xl font-bold mb-6 text-foreground">
+                Ready to discover your next favorite film?
+              </h2>
+              <p className="text-xl mb-8 text-foreground/80">
+                Join the ultimate movie community and never run out of great films to watch
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button 
+                  size="lg" 
+                  color="primary"
+                  className="text-lg px-12 py-4 font-semibold"
+                >
+                  Get Started Free 🎬
+                </Button>
+                <Chip 
+                  color="success"
+                  variant="flat"
+                  className="text-sm px-4 py-2"
+                >
+                  No account required
+                </Chip>
+              </div>
+            </motion.div>
+          </CardBody>
+        </Card>
       </section>
-    </main>
+    </div>
   )
 }

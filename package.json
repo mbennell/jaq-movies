@@ -18,6 +18,8 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@heroui/react": "^2.8.0",
+    "@heroui/theme": "^2.4.18",
     "@prisma/client": "^6.11.1",
     "@tailwindcss/postcss": "^4.1.11",
     "@types/node": "^24.0.13",
