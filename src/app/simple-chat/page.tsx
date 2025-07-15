@@ -236,7 +236,7 @@ export default function SimpleChatPage() {
                       color: '#666',
                       fontStyle: 'italic'
                     }}>
-                      "{rec.jaqNotes}"
+                      &quot;{rec.jaqNotes}&quot;
                     </p>
                   )}
                   <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
@@ -269,7 +269,7 @@ export default function SimpleChatPage() {
               fontSize: '14px'
             }}
           >
-            Import Jaq's Collection (Admin)
+            Import Jaq&apos;s Collection (Admin)
           </a>
         </div>
       </div>
