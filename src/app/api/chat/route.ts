@@ -8,7 +8,7 @@ const prisma = new PrismaClient()
 function classifyIntent(message: string): 'REQUEST_RECOMMENDATION' | 'SUBMIT_RECOMMENDATION' | 'DISCUSSION' | 'QUESTION' {
   const lowerMessage = message.toLowerCase();
   
-  // Intent patterns
+  // Intent patterns - made more specific and added debug
   const recommendationSubmissionPatterns = [
     /just watched/i,
     /watched.*and/i,
@@ -29,10 +29,18 @@ function classifyIntent(message: string): 'REQUEST_RECOMMENDATION' | 'SUBMIT_REC
     /looking for/i,
     /want.*watch/i,
     /need.*movie/i,
-    /feel like/i,
+    /feel.*like/i,
+    /feeling.*like/i,
     /mood for/i,
     /tonight/i,
-    /weekend/i
+    /weekend/i,
+    /sci.?fi/i,
+    /science fiction/i,
+    /horror/i,
+    /comedy/i,
+    /action/i,
+    /thriller/i,
+    /drama/i
   ];
   
   const discussionPatterns = [
@@ -46,22 +54,26 @@ function classifyIntent(message: string): 'REQUEST_RECOMMENDATION' | 'SUBMIT_REC
   // Check patterns
   for (const pattern of recommendationSubmissionPatterns) {
     if (pattern.test(lowerMessage)) {
+      console.log('Classified as SUBMIT_RECOMMENDATION:', lowerMessage);
       return 'SUBMIT_RECOMMENDATION';
     }
   }
   
   for (const pattern of recommendationRequestPatterns) {
     if (pattern.test(lowerMessage)) {
+      console.log('Classified as REQUEST_RECOMMENDATION:', lowerMessage);
       return 'REQUEST_RECOMMENDATION';
     }
   }
   
   for (const pattern of discussionPatterns) {
     if (pattern.test(lowerMessage)) {
+      console.log('Classified as DISCUSSION:', lowerMessage);
       return 'DISCUSSION';
     }
   }
   
+  console.log('Classified as QUESTION:', lowerMessage);
   return 'QUESTION';
 }
 
@@ -90,7 +102,19 @@ function extractMovieTitle(message: string): string | null {
 async function generateResponse(intent: string, message: string, movieTitle?: string) {
   switch (intent) {
     case 'REQUEST_RECOMMENDATION':
-      // Get some recommendations from Jaq's collection
+      // Check if they mentioned a genre
+      const lowerMessage = message.toLowerCase();
+      let genreFilter = '';
+      
+      if (lowerMessage.includes('sci-fi') || lowerMessage.includes('science fiction')) {
+        genreFilter = 'sci-fi';
+      } else if (lowerMessage.includes('horror')) {
+        genreFilter = 'horror';
+      } else if (lowerMessage.includes('comedy')) {
+        genreFilter = 'comedy';
+      }
+      
+      // Get recommendations from Jaq's collection
       const recommendations = await prisma.recommendation.findMany({
         include: {
           movie: true
@@ -101,18 +125,36 @@ async function generateResponse(intent: string, message: string, movieTitle?: st
         orderBy: {
           enthusiasmLevel: 'desc'
         },
-        take: 3
+        take: 6
       });
       
       if (recommendations.length === 0) {
-        return "I don't have any recommendations loaded yet! Try importing Jaq's collection first.";
+        return "I don't have any recommendations loaded yet! Try importing Jaq's collection first by going to /admin";
       }
       
-      const topPicks = recommendations.map(rec => 
-        `${rec.movie.title} ${rec.jaqNotes ? `(${rec.jaqNotes})` : ''}`
+      // Filter by genre if requested
+      let filteredRecs = recommendations;
+      if (genreFilter === 'sci-fi') {
+        filteredRecs = recommendations.filter(rec => 
+          rec.movie.title.toLowerCase().includes('inception') ||
+          rec.movie.title.toLowerCase().includes('interstellar') ||
+          rec.movie.title.toLowerCase().includes('ad astra') ||
+          rec.movie.title.toLowerCase().includes('prometheus') ||
+          rec.movie.title.toLowerCase().includes('arrival') ||
+          rec.movie.title.toLowerCase().includes('sunshine')
+        );
+      }
+      
+      const recs = filteredRecs.length > 0 ? filteredRecs : recommendations;
+      const topPicks = recs.slice(0, 3).map(rec => 
+        `${rec.movie.title}${rec.jaqNotes ? ` (${rec.jaqNotes})` : ''}`
       ).join(', ');
       
-      return `Here are some of Jaq's top picks: ${topPicks}. What genre or mood are you in the mood for?`;
+      if (genreFilter) {
+        return `Great choice! For ${genreFilter}, here are some of Jaq's favorites: ${topPicks}. Any of these sound good?`;
+      }
+      
+      return `Here are some of Jaq's top picks: ${topPicks}. What genre or mood are you feeling?`;
     
     case 'SUBMIT_RECOMMENDATION':
       if (movieTitle) {

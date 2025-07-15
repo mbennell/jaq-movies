@@ -55,7 +55,7 @@ export default function Home() {
               <Button 
                 color="primary" 
                 variant="ghost"
-                onClick={() => router.push('/chat')}
+                onClick={() => router.push('/simple-chat')}
               >
                 Start Chatting
               </Button>
@@ -210,7 +210,7 @@ export default function Home() {
                   size="lg" 
                   color="primary"
                   className="text-lg px-12 py-4 font-semibold"
-                  onClick={() => router.push('/chat')}
+                  onClick={() => router.push('/simple-chat')}
                 >
                   Get Started Free 💬
                 </Button>
