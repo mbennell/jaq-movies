@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Navigation from '../../components/Navigation'
 
 interface ChatMessage {
   type: 'user' | 'ai'
@@ -95,20 +96,21 @@ export default function SimpleChatPage() {
   }
 
   return (
-    <div style={{ 
-      minHeight: '100vh', 
-      padding: '20px', 
-      fontFamily: 'system-ui, sans-serif',
-      backgroundColor: '#f5f5f5'
-    }}>
-      <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+    <div style={{ backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
+      <Navigation />
+      
+      <div style={{ 
+        maxWidth: '800px', 
+        margin: '0 auto', 
+        padding: '2rem'
+      }}>
         {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-          <h1 style={{ fontSize: '32px', color: '#333', marginBottom: '10px' }}>
-            Movie Chat
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <h1 style={{ fontSize: '2.5rem', color: '#333', marginBottom: '1rem' }}>
+            🤖 AI Movie Chat
           </h1>
-          <p style={{ fontSize: '18px', color: '#666' }}>
-            Tell me what you watched, or ask for recommendations!
+          <p style={{ fontSize: '1.2rem', color: '#666' }}>
+            Ask for recommendations or tell me what you watched!
           </p>
         </div>
 

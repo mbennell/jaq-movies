@@ -1,231 +1,110 @@
-'use client'
-
-import { motion } from 'framer-motion'
-import { Button, Card, CardBody, Navbar, NavbarBrand, NavbarContent, NavbarItem, Chip } from '@heroui/react'
-import { useRouter } from 'next/navigation'
+import Navigation from '../components/Navigation'
+import Link from 'next/link'
 
 export default function Home() {
-  const router = useRouter()
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2
-      }
-    }
-  }
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0 }
-  }
-
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      {/* Background Effects */}
-      <div className="fixed inset-0 bg-gradient-to-br from-background via-background/90 to-background" />
-      <div className="fixed top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-      <div className="fixed bottom-0 right-1/4 w-96 h-96 bg-success/5 rounded-full blur-3xl" />
+    <div>
+      <Navigation />
       
-      {/* Film Grain Effect */}
-      <div className="fixed inset-0 opacity-20 pointer-events-none film-grain" />
-      
-      {/* Navigation */}
-      <Navbar className="backdrop-blur-md bg-background/40" maxWidth="full">
-        <NavbarBrand>
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <h1 className="text-2xl font-bold text-primary cinema-glow">
-              🎬 Jaq&apos;s Best Ever Movie Guide
-            </h1>
-          </motion.div>
-        </NavbarBrand>
-        <NavbarContent justify="end">
-          <NavbarItem>
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <Button 
-                color="primary" 
-                variant="ghost"
-                onClick={() => router.push('/simple-chat')}
-              >
-                Start Chatting
-              </Button>
-            </motion.div>
-          </NavbarItem>
-        </NavbarContent>
-      </Navbar>
-
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center px-6 pt-24">
-        <motion.div 
-          className="text-center max-w-6xl mx-auto z-10"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          <motion.div variants={itemVariants} className="mb-8">
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6">
-              <span className="text-foreground">The </span>
-              <span className="text-primary cinema-glow">Best Ever</span>
-              <br />
-              <span className="text-foreground">Movie Guide</span>
-            </h1>
-            <p className="text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed text-foreground/80">
-              Your personal AI-powered cinema companion for discovering, sharing, and discussing the world&apos;s greatest films
-            </p>
-          </motion.div>
-
-          <motion.div 
-            variants={itemVariants}
-            className="flex flex-col sm:flex-row gap-4 justify-center mb-16"
-          >
-            <Button 
-              size="lg" 
-              color="primary"
-              className="text-lg px-8 py-4 font-semibold"
-              onClick={() => router.push('/chat')}
-            >
-              💬 Start Chatting
-            </Button>
-          </motion.div>
-
-          {/* Floating Elements */}
-          <motion.div
-            className="absolute top-20 left-10 text-6xl opacity-20"
-            animate={{ 
-              y: [0, -10, 0],
-              rotate: [0, 5, 0]
-            }}
-            transition={{ 
-              duration: 4,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          >
-            🎭
-          </motion.div>
-          <motion.div
-            className="absolute top-40 right-10 text-5xl opacity-20"
-            animate={{ 
-              y: [0, 10, 0],
-              rotate: [0, -5, 0]
-            }}
-            transition={{ 
-              duration: 3,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 1
-            }}
-          >
-            🍿
-          </motion.div>
-        </motion.div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-24 px-6 relative z-10">
-        <motion.div 
-          className="max-w-7xl mx-auto"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-        >
-          <motion.h2 
-            variants={itemVariants}
-            className="text-4xl md:text-5xl font-bold text-center mb-16"
-          >
-            <span className="text-foreground">Cinema Magic</span>
-            <br />
-            <span className="text-primary">At Your Fingertips</span>
-          </motion.h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <motion.div variants={itemVariants}>
-              <Card className="h-full bg-background/40 backdrop-blur-md border-success/20 hover:border-success/40 transition-all duration-300">
-                <CardBody className="text-center p-6">
-                  <div className="text-4xl mb-4">🤖</div>
-                  <h3 className="text-xl font-semibold mb-3 text-success">AI Research</h3>
-                  <p className="text-foreground/70">
-                    Automatic movie details, ratings, and streaming availability
-                  </p>
-                </CardBody>
-              </Card>
-            </motion.div>
-
-            <motion.div variants={itemVariants}>
-              <Card className="h-full bg-background/40 backdrop-blur-md border-secondary/20 hover:border-secondary/40 transition-all duration-300">
-                <CardBody className="text-center p-6">
-                  <div className="text-4xl mb-4">👥</div>
-                  <h3 className="text-xl font-semibold mb-3 text-secondary">Social Discovery</h3>
-                  <p className="text-foreground/70">
-                    Connect with friends and discover new movies together
-                  </p>
-                </CardBody>
-              </Card>
-            </motion.div>
-
-            <motion.div variants={itemVariants}>
-              <Card className="h-full bg-background/40 backdrop-blur-md border-warning/20 hover:border-warning/40 transition-all duration-300">
-                <CardBody className="text-center p-6">
-                  <div className="text-4xl mb-4">🔍</div>
-                  <h3 className="text-xl font-semibold mb-3 text-warning">Smart Curation</h3>
-                  <p className="text-foreground/70">
-                    Find movies based on mood, genre, and personal preferences
-                  </p>
-                </CardBody>
-              </Card>
-            </motion.div>
-          </div>
-        </motion.div>
-      </section>
-
-      {/* Call to Action */}
-      <section className="py-24 px-6 relative z-10">
-        <Card className="max-w-4xl mx-auto bg-background/60 backdrop-blur-md border-primary/30">
-          <CardBody className="text-center p-12">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-            >
-              <h2 className="text-3xl md:text-4xl font-bold mb-6 text-foreground">
-                Ready to discover your next favorite film?
-              </h2>
-              <p className="text-xl mb-8 text-foreground/80">
-                Join the ultimate movie community and never run out of great films to watch
+      <div style={{ 
+        maxWidth: '800px', 
+        margin: '0 auto', 
+        padding: '2rem',
+        textAlign: 'center' 
+      }}>
+        <h1 style={{ 
+          fontSize: '3rem', 
+          marginBottom: '1rem',
+          color: '#333'
+        }}>
+          🎬 Jaq&apos;s Movie Guide
+        </h1>
+        
+        <p style={{ 
+          fontSize: '1.2rem', 
+          marginBottom: '3rem', 
+          color: '#666',
+          lineHeight: '1.6'
+        }}>
+          Get personalized movie recommendations from Jaq&apos;s curated collection. 
+          Chat with our AI assistant or browse the complete library.
+        </p>
+        
+        <div style={{ 
+          display: 'flex', 
+          gap: '1rem', 
+          justifyContent: 'center',
+          flexWrap: 'wrap',
+          marginBottom: '3rem'
+        }}>
+          <Link href="/simple-chat" style={{
+            backgroundColor: '#0066cc',
+            color: 'white',
+            padding: '1rem 2rem',
+            textDecoration: 'none',
+            borderRadius: '8px',
+            fontSize: '1.1rem',
+            fontWeight: 'bold'
+          }}>
+            💬 Start AI Chat
+          </Link>
+          
+          <Link href="/movies" style={{
+            backgroundColor: '#28a745',
+            color: 'white',
+            padding: '1rem 2rem',
+            textDecoration: 'none',
+            borderRadius: '8px',
+            fontSize: '1.1rem',
+            fontWeight: 'bold'
+          }}>
+            📚 Browse Movies
+          </Link>
+        </div>
+        
+        <div style={{ 
+          backgroundColor: '#f8f9fa',
+          padding: '2rem',
+          borderRadius: '8px',
+          border: '1px solid #e9ecef'
+        }}>
+          <h2 style={{ 
+            fontSize: '1.5rem', 
+            marginBottom: '1rem',
+            color: '#333'
+          }}>
+            What You Can Do:
+          </h2>
+          
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+            gap: '1.5rem',
+            textAlign: 'left'
+          }}>
+            <div>
+              <h3 style={{ color: '#0066cc', marginBottom: '0.5rem' }}>🤖 AI Chat</h3>
+              <p style={{ color: '#666', fontSize: '0.9rem' }}>
+                Ask for recommendations like &quot;I want something sci-fi&quot; or &quot;recommend a good thriller&quot;
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button 
-                  size="lg" 
-                  color="primary"
-                  className="text-lg px-12 py-4 font-semibold"
-                  onClick={() => router.push('/simple-chat')}
-                >
-                  Get Started Free 💬
-                </Button>
-                <Chip 
-                  color="success"
-                  variant="flat"
-                  className="text-sm px-4 py-2"
-                >
-                  No account required
-                </Chip>
-              </div>
-            </motion.div>
-          </CardBody>
-        </Card>
-      </section>
+            </div>
+            
+            <div>
+              <h3 style={{ color: '#28a745', marginBottom: '0.5rem' }}>📱 Browse</h3>
+              <p style={{ color: '#666', fontSize: '0.9rem' }}>
+                Explore Jaq&apos;s complete collection with ratings and personal notes
+              </p>
+            </div>
+            
+            <div>
+              <h3 style={{ color: '#ffc107', marginBottom: '0.5rem' }}>⭐ Ratings</h3>
+              <p style={{ color: '#666', fontSize: '0.9rem' }}>
+                See TMDB ratings and Jaq&apos;s personal enthusiasm levels for each movie
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
