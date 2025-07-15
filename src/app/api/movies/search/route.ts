@@ -33,7 +33,15 @@ export async function GET(request: NextRequest) {
     const data = await response.json()
     
     // Transform the data to match our interface
-    const transformedResults = data.results.map((movie: any) => ({
+    const transformedResults = data.results.map((movie: {
+      id: number;
+      title: string;
+      overview: string;
+      release_date: string;
+      poster_path: string;
+      vote_average: number;
+      genre_ids: number[];
+    }) => ({
       id: movie.id,
       title: movie.title,
       overview: movie.overview,

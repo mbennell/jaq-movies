@@ -14,9 +14,9 @@ import {
   ModalBody,
   ModalFooter,
   useDisclosure,
-  Chip,
-  Image
+  Chip
 } from '@heroui/react'
+import Image from 'next/image'
 
 interface Movie {
   id: number
@@ -145,9 +145,11 @@ export default function MoviesPage() {
                           <div className="flex gap-4">
                             <div className="w-16 h-24 bg-foreground/10 rounded flex items-center justify-center overflow-hidden">
                               {movie.poster_path ? (
-                                <img
+                                <Image
                                   src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
                                   alt={movie.title}
+                                  width={64}
+                                  height={96}
                                   className="w-full h-full object-cover"
                                 />
                               ) : (
@@ -210,9 +212,11 @@ export default function MoviesPage() {
                     <CardBody className="p-4">
                       <div className="w-full h-48 bg-foreground/10 rounded mb-4 flex items-center justify-center overflow-hidden">
                         {movie.poster_path ? (
-                          <img
+                          <Image
                             src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                             alt={movie.title}
+                            width={300}
+                            height={450}
                             className="w-full h-full object-cover"
                           />
                         ) : (
@@ -251,9 +255,11 @@ export default function MoviesPage() {
                   <div className="flex gap-4">
                     <div className="w-24 h-36 bg-foreground/10 rounded flex items-center justify-center overflow-hidden">
                       {selectedMovie.poster_path ? (
-                        <img
+                        <Image
                           src={`https://image.tmdb.org/t/p/w300${selectedMovie.poster_path}`}
                           alt={selectedMovie.title}
+                          width={96}
+                          height={144}
                           className="w-full h-full object-cover"
                         />
                       ) : (
