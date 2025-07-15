@@ -50,7 +50,8 @@ export default function SimpleChatPage() {
     setIsLoading(true)
 
     try {
-      const response = await fetch('/api/assistant/simple', {
+      // Try OpenAI assistant first, fallback to simple chat if it fails
+      let response = await fetch('/api/assistant/simple', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -59,13 +60,27 @@ export default function SimpleChatPage() {
           message: input
         }),
       })
-
-      const data = await response.json()
-
+      
+      let data = await response.json()
+      
+      // If OpenAI fails, try fallback
+      if (!response.ok || data.status === 'error') {
+        console.log('Trying fallback chat...')
+        response = await fetch('/api/chat-fallback', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            message: input
+          }),
+        })
+        data = await response.json()
+      }
 
       const aiMessage: ChatMessage = {
         type: 'ai',
-        content: data.response,
+        content: data.response || 'Sorry, I had trouble processing that.',
         timestamp: new Date()
       }
 
@@ -147,7 +162,9 @@ export default function SimpleChatPage() {
                     color: message.type === 'user' ? 'white' : '#333'
                   }}
                 >
-                  <p style={{ margin: 0, fontSize: '14px' }}>{message.content}</p>
+                  <div style={{ margin: 0, fontSize: '14px' }}>
+                    {message.content}
+                  </div>
                   <p style={{ 
                     margin: '5px 0 0 0', 
                     fontSize: '11px', 
