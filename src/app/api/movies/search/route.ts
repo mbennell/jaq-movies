@@ -17,7 +17,13 @@ export async function GET(request: NextRequest) {
 
   try {
     const response = await fetch(
-      `${TMDB_BASE_URL}/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}&page=1`
+      `${TMDB_BASE_URL}/search/movie?query=${encodeURIComponent(query)}&page=1`,
+      {
+        headers: {
+          'Authorization': `Bearer ${TMDB_API_KEY}`,
+          'Content-Type': 'application/json'
+        }
+      }
     )
 
     if (!response.ok) {

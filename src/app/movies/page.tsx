@@ -143,17 +143,25 @@ export default function MoviesPage() {
                       >
                         <CardBody className="p-4">
                           <div className="flex gap-4">
-                            <div className="w-16 h-24 bg-foreground/10 rounded flex items-center justify-center">
-                              📽️
+                            <div className="w-16 h-24 bg-foreground/10 rounded flex items-center justify-center overflow-hidden">
+                              {movie.poster_path ? (
+                                <img
+                                  src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
+                                  alt={movie.title}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <span className="text-2xl">📽️</span>
+                              )}
                             </div>
                             <div className="flex-1">
                               <h3 className="font-semibold text-lg">{movie.title}</h3>
                               <p className="text-sm text-foreground/70 mb-2">
-                                {new Date(movie.release_date).getFullYear()}
+                                {movie.release_date ? new Date(movie.release_date).getFullYear() : 'Unknown'}
                               </p>
                               <div className="flex items-center gap-2">
                                 <Chip color="warning" size="sm">
-                                  ⭐ {movie.vote_average}
+                                  ⭐ {movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A'}
                                 </Chip>
                               </div>
                             </div>
@@ -200,19 +208,27 @@ export default function MoviesPage() {
                 >
                   <Card className="h-full bg-background/40 backdrop-blur-md border-primary/20 hover:border-primary/40 transition-all duration-300">
                     <CardBody className="p-4">
-                      <div className="w-full h-48 bg-foreground/10 rounded mb-4 flex items-center justify-center">
-                        <span className="text-4xl">📽️</span>
+                      <div className="w-full h-48 bg-foreground/10 rounded mb-4 flex items-center justify-center overflow-hidden">
+                        {movie.poster_path ? (
+                          <img
+                            src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                            alt={movie.title}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <span className="text-4xl">📽️</span>
+                        )}
                       </div>
                       <h3 className="font-semibold text-lg mb-2">{movie.title}</h3>
                       <p className="text-sm text-foreground/70 mb-3 line-clamp-3">
-                        {movie.overview}
+                        {movie.overview || 'No overview available'}
                       </p>
                       <div className="flex items-center justify-between">
                         <Chip color="warning" size="sm">
-                          ⭐ {movie.vote_average}
+                          ⭐ {movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A'}
                         </Chip>
                         <span className="text-sm text-foreground/60">
-                          {new Date(movie.release_date).getFullYear()}
+                          {movie.release_date ? new Date(movie.release_date).getFullYear() : 'Unknown'}
                         </span>
                       </div>
                     </CardBody>
@@ -233,20 +249,28 @@ export default function MoviesPage() {
               {selectedMovie && (
                 <div className="space-y-4">
                   <div className="flex gap-4">
-                    <div className="w-24 h-36 bg-foreground/10 rounded flex items-center justify-center">
-                      📽️
+                    <div className="w-24 h-36 bg-foreground/10 rounded flex items-center justify-center overflow-hidden">
+                      {selectedMovie.poster_path ? (
+                        <img
+                          src={`https://image.tmdb.org/t/p/w300${selectedMovie.poster_path}`}
+                          alt={selectedMovie.title}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-3xl">📽️</span>
+                      )}
                     </div>
                     <div className="flex-1">
                       <h3 className="text-xl font-semibold mb-2">{selectedMovie.title}</h3>
                       <p className="text-sm text-foreground/70 mb-3">
-                        {selectedMovie.overview}
+                        {selectedMovie.overview || 'No overview available'}
                       </p>
                       <div className="flex items-center gap-2">
                         <Chip color="warning" size="sm">
-                          ⭐ {selectedMovie.vote_average}
+                          ⭐ {selectedMovie.vote_average ? selectedMovie.vote_average.toFixed(1) : 'N/A'}
                         </Chip>
                         <span className="text-sm text-foreground/60">
-                          {new Date(selectedMovie.release_date).getFullYear()}
+                          {selectedMovie.release_date ? new Date(selectedMovie.release_date).getFullYear() : 'Unknown'}
                         </span>
                       </div>
                     </div>
