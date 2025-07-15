@@ -5,7 +5,14 @@ import { Button, Card, CardBody, Chip } from '@heroui/react'
 
 export default function AdminPage() {
   const [importStatus, setImportStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
-  const [importResults, setImportResults] = useState<any>(null)
+  const [importResults, setImportResults] = useState<{
+    results?: {
+      processed: number;
+      successful: number;
+      failed: number;
+    };
+    error?: string;
+  } | null>(null)
 
   const runImport = async () => {
     setImportStatus('loading')
@@ -28,7 +35,7 @@ export default function AdminPage() {
         setImportStatus('error')
         setImportResults(result)
       }
-    } catch (error) {
+    } catch (err) {
       setImportStatus('error')
       setImportResults({ error: 'Failed to import' })
     }
@@ -41,9 +48,9 @@ export default function AdminPage() {
         
         <Card className="bg-background/60 backdrop-blur-md border-primary/30 mb-6">
           <CardBody className="p-8">
-            <h2 className="text-xl font-semibold mb-4">Import Jaq's Collection</h2>
+            <h2 className="text-xl font-semibold mb-4">Import Jaq&apos;s Collection</h2>
             <p className="text-foreground/80 mb-6">
-              This will import all 42 movies/series from Jaq's Notion collection, 
+              This will import all 42 movies/series from Jaq&apos;s Notion collection, 
               enrich them with TMDB data, and add them to the database.
             </p>
             

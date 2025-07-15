@@ -43,7 +43,7 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       type: 'ai',
-      content: "Hi! I'm here to help with movie recommendations. You can tell me what you just watched, or ask me what you should watch next! 🎬",
+      content: "Hi! I&apos;m here to help with movie recommendations. You can tell me what you just watched, or ask me what you should watch next! 🎬",
       timestamp: new Date()
     }
   ])
@@ -229,7 +229,7 @@ export default function ChatPage() {
                           <div className="flex-1">
                             <h4 className="font-semibold text-sm">{rec.movie.title}</h4>
                             {rec.jaqNotes && (
-                              <p className="text-xs text-primary mt-1">"{rec.jaqNotes}"</p>
+                              <p className="text-xs text-primary mt-1">&quot;{rec.jaqNotes}&quot;</p>
                             )}
                             <div className="flex items-center gap-1 mt-2">
                               <Chip 

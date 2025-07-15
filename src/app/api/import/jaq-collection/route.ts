@@ -43,7 +43,10 @@ async function searchTMDB(title: string, type: 'MOVIE' | 'SERIES') {
 export async function POST() {
   try {
     // Load the parsed collection
-    const jaqCollection: JaqMovie[] = require('../../../../../scripts/jaq-collection.json');
+    const fs = require('fs');
+    const path = require('path');
+    const jaqCollectionPath = path.join(process.cwd(), 'scripts', 'jaq-collection.json');
+    const jaqCollection: JaqMovie[] = JSON.parse(fs.readFileSync(jaqCollectionPath, 'utf-8'));
     
     const results = {
       processed: 0,
