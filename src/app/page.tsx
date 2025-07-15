@@ -38,7 +38,7 @@ export default function Home() {
             transition={{ duration: 0.5 }}
           >
             <h1 className="text-2xl font-bold text-primary cinema-glow">
-              🎬 Jaq's Best Ever Movie Guide
+              🎬 Jaq&apos;s Best Ever Movie Guide
             </h1>
           </motion.div>
         </NavbarBrand>
@@ -73,7 +73,7 @@ export default function Home() {
               <span className="text-foreground">Movie Guide</span>
             </h1>
             <p className="text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed text-foreground/80">
-              Your personal AI-powered cinema companion for discovering, sharing, and discussing the world's greatest films
+              Your personal AI-powered cinema companion for discovering, sharing, and discussing the world&apos;s greatest films
             </p>
           </motion.div>
 
