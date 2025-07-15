@@ -11,6 +11,7 @@ model Movie {
   id            String   @id @default(cuid())
   tmdbId        Int?     @unique
   title         String
+  originalTitle String?
   overview      String?
   releaseDate   DateTime?
   runtime       Int?
@@ -25,22 +26,39 @@ model Movie {
   updatedAt     DateTime @updatedAt
 
   recommendations Recommendation[]
+  conversations   Conversation[]
 
   @@map("movies")
 }
 
 model Recommendation {
-  id        String   @id @default(cuid())
-  movieId   String   @map("movie_id")
-  content   String?
-  mood      String?
-  insights  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id               String   @id @default(cuid())
+  movieId          String   @map("movie_id")
+  recommendedBy    String   @default("user") // "jaq", username, or "user"
+  status           RecommendationStatus @default(RECOMMENDED)
+  jaqNotes         String?  // Original notes from Jaq
+  enthusiasmLevel  Int      @default(3) // 1-5 scale
+  personalNote     String?  // User's own notes
+  mood             String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   movie    Movie     @relation(fields: [movieId], references: [id], onDelete: Cascade)
 
   @@map("recommendations")
+}
+
+model Conversation {
+  id        String   @id @default(cuid())
+  input     String   // What user typed
+  intent    ConversationIntent
+  response  String   // AI response
+  movieId   String?  // If related to a specific movie
+  createdAt DateTime @default(now())
+
+  movie     Movie?   @relation(fields: [movieId], references: [id])
+
+  @@map("conversations")
 }
 
 enum MediaType {
@@ -48,4 +66,18 @@ enum MediaType {
   TV_SHOW
   DOCUMENTARY
   SERIES
+}
+
+enum RecommendationStatus {
+  RECOMMENDED
+  WATCHING
+  COMPLETED
+  WANT_TO_WATCH
+}
+
+enum ConversationIntent {
+  REQUEST_RECOMMENDATION
+  SUBMIT_RECOMMENDATION
+  DISCUSSION
+  QUESTION
 }

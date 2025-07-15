@@ -55,9 +55,9 @@ export default function Home() {
               <Button 
                 color="primary" 
                 variant="ghost"
-                onClick={() => router.push('/movies')}
+                onClick={() => router.push('/chat')}
               >
-                Start Exploring
+                Start Chatting
               </Button>
             </motion.div>
           </NavbarItem>
@@ -92,9 +92,9 @@ export default function Home() {
               size="lg" 
               color="primary"
               className="text-lg px-8 py-4 font-semibold"
-              onClick={() => router.push('/movies')}
+              onClick={() => router.push('/chat')}
             >
-              🎬 Start Discovering
+              💬 Start Chatting
             </Button>
           </motion.div>
 
@@ -210,9 +210,9 @@ export default function Home() {
                   size="lg" 
                   color="primary"
                   className="text-lg px-12 py-4 font-semibold"
-                  onClick={() => router.push('/movies')}
+                  onClick={() => router.push('/chat')}
                 >
-                  Get Started Free 🎬
+                  Get Started Free 💬
                 </Button>
                 <Chip 
                   color="success"
