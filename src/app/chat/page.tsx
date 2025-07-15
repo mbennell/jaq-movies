@@ -117,7 +117,7 @@ export default function ChatPage() {
           animate={{ opacity: 1, y: 0 }}
         >
           <h1 className="text-4xl font-bold text-primary mb-4">
-            🎬 Chat with Jaq's Movie Guide
+            🎬 Chat with Jaq&apos;s Movie Guide
           </h1>
           <p className="text-xl text-foreground/80">
             Tell me what you watched, or ask for recommendations!
