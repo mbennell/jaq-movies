@@ -118,13 +118,15 @@ export default function SimpleChatPage() {
     <div style={{ backgroundColor: 'var(--bg-primary)', minHeight: '100vh' }}>
       <Navigation isTransparent={true} />
       
-      <div style={{ height: '60vh', position: 'relative' }}>
+      <div style={{ height: '40vh', position: 'relative' }}>
         <Hero />
       </div>
       
       <div className="content-container" style={{ 
         paddingTop: 'var(--spacing-2xl)',
-        paddingBottom: 'var(--spacing-2xl)'
+        paddingBottom: 'var(--spacing-2xl)',
+        position: 'relative',
+        zIndex: 2
       }}>
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: 'var(--spacing-2xl)' }}>
@@ -153,7 +155,8 @@ export default function SimpleChatPage() {
           borderRadius: 'var(--border-radius-lg)',
           padding: 'var(--spacing-xl)',
           marginBottom: 'var(--spacing-xl)',
-          boxShadow: 'var(--shadow-lg)'
+          boxShadow: 'var(--shadow-xl)',
+          background: 'linear-gradient(135deg, var(--bg-card) 0%, rgba(255, 255, 255, 0.95) 100%)'
         }}>
           {/* Messages */}
           <div style={{ 
@@ -161,9 +164,11 @@ export default function SimpleChatPage() {
             overflowY: 'auto', 
             marginBottom: 'var(--spacing-xl)',
             padding: 'var(--spacing-md)',
-            backgroundColor: 'var(--bg-primary)',
+            backgroundColor: 'rgba(17, 17, 17, 0.8)',
             borderRadius: 'var(--border-radius)',
-            border: '1px solid var(--bg-secondary)'
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            backdropFilter: 'blur(10px)',
+            background: 'linear-gradient(135deg, rgba(17, 17, 17, 0.9) 0%, rgba(26, 26, 26, 0.8) 100%)'
           }}>
             {messages.map((message, index) => (
               <div
@@ -179,10 +184,18 @@ export default function SimpleChatPage() {
                     maxWidth: '70%',
                     padding: 'var(--spacing-md) var(--spacing-lg)',
                     borderRadius: 'var(--border-radius-full)',
-                    backgroundColor: message.type === 'user' ? 'var(--accent-primary)' : 'var(--bg-card)',
+                    backgroundColor: message.type === 'user' 
+                      ? 'linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-hover) 100%)'
+                      : 'rgba(255, 255, 255, 0.95)',
+                    background: message.type === 'user' 
+                      ? 'linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-hover) 100%)'
+                      : 'rgba(255, 255, 255, 0.95)',
                     color: message.type === 'user' ? 'white' : 'var(--text-dark)',
-                    boxShadow: 'var(--shadow-sm)',
-                    border: message.type === 'user' ? 'none' : '1px solid var(--bg-secondary)'
+                    boxShadow: message.type === 'user' 
+                      ? '0 4px 15px rgba(0, 102, 255, 0.3)' 
+                      : '0 2px 10px rgba(0, 0, 0, 0.1)',
+                    border: message.type === 'user' ? 'none' : '1px solid rgba(255, 255, 255, 0.2)',
+                    backdropFilter: 'blur(5px)'
                   }}
                 >
                   <div style={{ 
@@ -208,10 +221,11 @@ export default function SimpleChatPage() {
                   display: 'inline-block',
                   padding: 'var(--spacing-md) var(--spacing-lg)',
                   borderRadius: 'var(--border-radius-full)',
-                  backgroundColor: 'var(--bg-card)',
+                  backgroundColor: 'rgba(255, 255, 255, 0.95)',
                   color: 'var(--text-dark)',
-                  boxShadow: 'var(--shadow-sm)',
-                  border: '1px solid var(--bg-secondary)'
+                  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  backdropFilter: 'blur(5px)'
                 }}>
                   <span>Thinking...</span>
                 </div>
@@ -231,21 +245,25 @@ export default function SimpleChatPage() {
               style={{
                 flex: 1,
                 padding: 'var(--spacing-md) var(--spacing-lg)',
-                border: '1px solid var(--bg-secondary)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
                 borderRadius: 'var(--border-radius-full)',
                 fontSize: 'var(--font-size-base)',
-                backgroundColor: 'var(--bg-primary)',
+                backgroundColor: 'rgba(255, 255, 255, 0.08)',
                 color: 'var(--text-primary)',
                 outline: 'none',
-                transition: 'all var(--transition-normal)'
+                transition: 'all var(--transition-normal)',
+                backdropFilter: 'blur(10px)',
+                boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.1)'
               }}
               onFocus={(e) => {
                 e.target.style.borderColor = 'var(--accent-primary)'
-                e.target.style.boxShadow = '0 0 0 3px var(--accent-glow)'
+                e.target.style.boxShadow = '0 0 0 3px var(--accent-glow), inset 0 2px 4px rgba(0, 0, 0, 0.1)'
+                e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.12)'
               }}
               onBlur={(e) => {
-                e.target.style.borderColor = 'var(--bg-secondary)'
-                e.target.style.boxShadow = 'none'
+                e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)'
+                e.target.style.boxShadow = 'inset 0 2px 4px rgba(0, 0, 0, 0.1)'
+                e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.08)'
               }}
             />
             <button
