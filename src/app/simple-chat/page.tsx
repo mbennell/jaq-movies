@@ -65,7 +65,7 @@ export default function SimpleChatPage() {
       
       // If OpenAI fails, try fallback
       if (!response.ok || data.status === 'error') {
-        console.log('Trying fallback chat...')
+        console.log('OpenAI failed, trying fallback chat...', data.error || 'Unknown error')
         response = await fetch('/api/chat-fallback', {
           method: 'POST',
           headers: {
@@ -76,6 +76,9 @@ export default function SimpleChatPage() {
           }),
         })
         data = await response.json()
+        console.log('Fallback response:', data)
+      } else {
+        console.log('OpenAI response successful:', data)
       }
 
       const aiMessage: ChatMessage = {

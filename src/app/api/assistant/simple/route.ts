@@ -23,12 +23,15 @@ export async function POST(request: NextRequest) {
     
     // Check if OpenAI is configured
     if (!process.env.OPENAI_API_KEY) {
+      console.log('OpenAI API key not configured, will fallback')
       return NextResponse.json({
         error: 'OpenAI not configured',
-        response: 'AI chat is not available right now. Please try the basic movie browsing instead.',
+        response: 'AI chat is not available right now. Using basic recommendations instead.',
         status: 'error'
       }, { status: 200 })
     }
+    
+    console.log('OpenAI API key found, proceeding with AI request')
     
     // Get some movies from database for context
     let movieContext = []
@@ -71,16 +74,20 @@ export async function POST(request: NextRequest) {
     
     // Simple OpenAI chat completion
     try {
+      console.log('Making OpenAI request with', movieContext.length, 'movies in context')
+      
       const response = await openai.chat.completions.create({
-        model: 'gpt-4',
+        model: 'gpt-4o-mini', // Use the faster, cheaper model
         messages: [
           {
             role: 'system',
-            content: `You are a movie recommendation assistant for Jaq's curated collection. Here are the available movies with Jaq's ratings (showing first 10):
+            content: `You are a movie recommendation assistant for Jaq's curated collection. Here are the available movies:
 
-${JSON.stringify(movieContext.slice(0, 5), null, 2)}
+${movieContext.slice(0, 10).map(movie => 
+  `"${movie.title}" (${movie.rating || 'No rating'}/10)${movie.jaqNotes ? ` - ${movie.jaqNotes}` : ''}${movie.genres ? ` Genres: ${movie.genres.join(', ')}` : ''}`
+).join('\n')}
 
-Help users discover movies from this collection. Be conversational, enthusiastic, and provide specific recommendations based on their requests. Include Jaq's notes when relevant. Keep responses under 200 words.`
+Help users discover movies from this collection. Be conversational and provide specific recommendations. If asking for a genre like sci-fi, look for relevant movies and recommend them. Keep responses under 150 words.`
           },
           {
             role: 'user',
@@ -88,7 +95,7 @@ Help users discover movies from this collection. Be conversational, enthusiastic
           }
         ],
         temperature: 0.7,
-        max_tokens: 300
+        max_tokens: 250
       })
       
       const aiResponse = response.choices[0]?.message?.content || 'Sorry, I had trouble processing that.'

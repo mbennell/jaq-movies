@@ -8,6 +8,7 @@ interface MovieContext {
   title: string;
   overview?: string | null;
   rating?: number | null;
+  genres?: string[] | null;
   jaqNotes?: string | null;
   enthusiasmLevel?: number;
 }
@@ -15,56 +16,129 @@ interface MovieContext {
 function getRecommendationResponse(message: string, movies: MovieContext[]) {
   const lowerMessage = message.toLowerCase()
   
-  // Genre-based recommendations
-  if (lowerMessage.includes('sci-fi') || lowerMessage.includes('science fiction')) {
-    const sciFiMovies = movies.filter(m => 
-      m.title.toLowerCase().includes('inception') ||
-      m.title.toLowerCase().includes('interstellar') ||
-      m.title.toLowerCase().includes('ad astra') ||
-      m.overview?.toLowerCase().includes('space') ||
-      m.overview?.toLowerCase().includes('future')
-    )
+  // Enhanced sci-fi detection
+  if (lowerMessage.includes('sci-fi') || lowerMessage.includes('sci fi') || 
+      lowerMessage.includes('science fiction') || lowerMessage.includes('scifi') ||
+      lowerMessage.includes('space') || lowerMessage.includes('ai') ||
+      lowerMessage.includes('artificial intelligence') || lowerMessage.includes('future')) {
+    
+    const sciFiMovies = movies.filter(m => {
+      const titleMatch = m.title.toLowerCase().includes('inception') ||
+                        m.title.toLowerCase().includes('interstellar') ||
+                        m.title.toLowerCase().includes('matrix') ||
+                        m.title.toLowerCase().includes('blade runner') ||
+                        m.title.toLowerCase().includes('alien') ||
+                        m.title.toLowerCase().includes('star')
+      
+      const overviewMatch = m.overview?.toLowerCase().includes('space') ||
+                           m.overview?.toLowerCase().includes('future') ||
+                           m.overview?.toLowerCase().includes('alien') ||
+                           m.overview?.toLowerCase().includes('technology') ||
+                           m.overview?.toLowerCase().includes('artificial') ||
+                           m.overview?.toLowerCase().includes('robot') ||
+                           m.overview?.toLowerCase().includes('cyber')
+      
+      const genreMatch = m.genres?.some(genre => 
+        genre === '878' || // TMDB sci-fi genre ID
+        genre.toLowerCase().includes('sci')
+      )
+      
+      return titleMatch || overviewMatch || genreMatch
+    })
+    
     if (sciFiMovies.length > 0) {
-      const movie = sciFiMovies[0]
-      return `For sci-fi, I recommend "${movie.title}"! ${movie.jaqNotes ? `Jaq says: ${movie.jaqNotes}` : ''} ${movie.rating ? `TMDB rating: ${movie.rating}/10` : ''}`
+      const topSciFi = sciFiMovies.sort((a, b) => (b.enthusiasmLevel || 0) - (a.enthusiasmLevel || 0)).slice(0, 2)
+      if (topSciFi.length === 1) {
+        const movie = topSciFi[0]
+        return `Perfect! For sci-fi, I recommend "${movie.title}"${movie.jaqNotes ? ` - ${movie.jaqNotes}` : ''}${movie.rating ? ` (${movie.rating}/10)` : ''}. Sound interesting?`
+      } else {
+        const titles = topSciFi.map(m => `"${m.title}"`).join(' or ')
+        return `Great choice! For sci-fi, I'd suggest ${titles}. Both are excellent picks from Jaq's collection!`
+      }
     }
   }
   
-  if (lowerMessage.includes('horror')) {
-    const horrorMovies = movies.filter(m => 
-      m.overview?.toLowerCase().includes('horror') ||
-      m.overview?.toLowerCase().includes('scary') ||
-      m.title.toLowerCase().includes('fresh')
-    )
+  // Enhanced horror detection
+  if (lowerMessage.includes('horror') || lowerMessage.includes('scary') || 
+      lowerMessage.includes('thriller') || lowerMessage.includes('suspense')) {
+    
+    const horrorMovies = movies.filter(m => {
+      const titleMatch = m.title.toLowerCase().includes('fresh') ||
+                        m.title.toLowerCase().includes('horror') ||
+                        m.title.toLowerCase().includes('nightmare') ||
+                        m.title.toLowerCase().includes('dead')
+      
+      const overviewMatch = m.overview?.toLowerCase().includes('horror') ||
+                           m.overview?.toLowerCase().includes('scary') ||
+                           m.overview?.toLowerCase().includes('terror') ||
+                           m.overview?.toLowerCase().includes('killer') ||
+                           m.overview?.toLowerCase().includes('murder')
+      
+      const genreMatch = m.genres?.some(genre => 
+        genre === '27' || // TMDB horror genre ID
+        genre.toLowerCase().includes('horror') ||
+        genre.toLowerCase().includes('thriller')
+      )
+      
+      return titleMatch || overviewMatch || genreMatch
+    })
+    
     if (horrorMovies.length > 0) {
-      const movie = horrorMovies[0]
-      return `For horror, try "${movie.title}"! ${movie.jaqNotes ? `Jaq's note: ${movie.jaqNotes}` : ''}`
+      const movie = horrorMovies.sort((a, b) => (b.enthusiasmLevel || 0) - (a.enthusiasmLevel || 0))[0]
+      return `For something scary, try "${movie.title}"!${movie.jaqNotes ? ` Jaq's note: ${movie.jaqNotes}` : ''}${movie.rating ? ` (${movie.rating}/10)` : ''}`
     }
   }
   
-  if (lowerMessage.includes('comedy')) {
-    const comedyMovies = movies.filter(m => 
-      m.overview?.toLowerCase().includes('comedy') ||
-      m.overview?.toLowerCase().includes('funny')
-    )
+  // Enhanced comedy detection
+  if (lowerMessage.includes('comedy') || lowerMessage.includes('funny') || 
+      lowerMessage.includes('laugh') || lowerMessage.includes('humor')) {
+    
+    const comedyMovies = movies.filter(m => {
+      const titleMatch = m.title.toLowerCase().includes('comedy') ||
+                        m.title.toLowerCase().includes('funny')
+      
+      const overviewMatch = m.overview?.toLowerCase().includes('comedy') ||
+                           m.overview?.toLowerCase().includes('funny') ||
+                           m.overview?.toLowerCase().includes('humor') ||
+                           m.overview?.toLowerCase().includes('laugh')
+      
+      const genreMatch = m.genres?.some(genre => 
+        genre === '35' || // TMDB comedy genre ID
+        genre.toLowerCase().includes('comedy')
+      )
+      
+      return titleMatch || overviewMatch || genreMatch
+    })
+    
     if (comedyMovies.length > 0) {
-      const movie = comedyMovies[0]
-      return `For comedy, I suggest "${movie.title}"! ${movie.jaqNotes ? `Jaq says: ${movie.jaqNotes}` : ''}`
+      const movie = comedyMovies.sort((a, b) => (b.enthusiasmLevel || 0) - (a.enthusiasmLevel || 0))[0]
+      return `For a good laugh, check out "${movie.title}"!${movie.jaqNotes ? ` ${movie.jaqNotes}` : ''}${movie.rating ? ` (${movie.rating}/10)` : ''}`
     }
   }
   
-  // Default recommendation - highest enthusiasm
-  const topMovies = movies
-    .filter(m => (m.enthusiasmLevel || 0) >= 4)
-    .sort((a, b) => (b.enthusiasmLevel || 0) - (a.enthusiasmLevel || 0))
-    .slice(0, 3)
-  
-  if (topMovies.length > 0) {
-    const recommendations = topMovies.map(m => `"${m.title}"`).join(', ')
-    return `Here are some of Jaq's top picks: ${recommendations}. What genre interests you most?`
+  // General recommendation request
+  if (lowerMessage.includes('recommend') || lowerMessage.includes('suggest') || 
+      lowerMessage.includes('watch') || lowerMessage.includes('good')) {
+    
+    const topMovies = movies
+      .filter(m => (m.enthusiasmLevel || 0) >= 4)
+      .sort((a, b) => (b.enthusiasmLevel || 0) - (a.enthusiasmLevel || 0))
+      .slice(0, 3)
+    
+    if (topMovies.length > 0) {
+      if (topMovies.length === 1) {
+        const movie = topMovies[0]
+        return `I highly recommend "${movie.title}"!${movie.jaqNotes ? ` ${movie.jaqNotes}` : ''}${movie.rating ? ` (${movie.rating}/10)` : ''} What do you think?`
+      } else {
+        const titles = topMovies.map(m => `"${m.title}"`).join(', ')
+        return `Here are Jaq's top picks: ${titles}. Any of these sound good to you?`
+      }
+    }
   }
   
-  return "I have movies in the collection, but I need more specific preferences. Try asking for a genre like sci-fi, horror, or comedy!"
+  // Show some available movies if no specific genre found
+  const sampleMovies = movies.slice(0, 3).map(m => `"${m.title}"`).join(', ')
+  return `I have ${movies.length} movies in Jaq's collection! Some options include: ${sampleMovies}. What genre or mood are you in the mood for?`
 }
 
 export async function POST(request: NextRequest) {
@@ -107,6 +181,7 @@ export async function POST(request: NextRequest) {
       title: movie.title,
       overview: movie.overview,
       rating: movie.rating,
+      genres: movie.genres,
       jaqNotes: movie.recommendations[0]?.jaqNotes,
       enthusiasmLevel: movie.recommendations[0]?.enthusiasmLevel
     }))
