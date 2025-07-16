@@ -123,7 +123,7 @@ export default function SimpleChatPage() {
       </div>
       
       <div className="content-container" style={{ 
-        paddingTop: 'var(--spacing-2xl)',
+        paddingTop: 'var(--spacing-4xl)',
         paddingBottom: 'var(--spacing-2xl)',
         position: 'relative',
         zIndex: 2
@@ -164,11 +164,17 @@ export default function SimpleChatPage() {
             overflowY: 'auto', 
             marginBottom: 'var(--spacing-xl)',
             padding: 'var(--spacing-md)',
-            backgroundColor: 'rgba(17, 17, 17, 0.8)',
+            backgroundColor: 'rgba(17, 17, 17, 0.95)',
             borderRadius: 'var(--border-radius)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            backdropFilter: 'blur(10px)',
-            background: 'linear-gradient(135deg, rgba(17, 17, 17, 0.9) 0%, rgba(26, 26, 26, 0.8) 100%)'
+            border: '2px solid var(--accent-primary)',
+            backdropFilter: 'blur(15px)',
+            background: 'linear-gradient(135deg, rgba(17, 17, 17, 0.95) 0%, rgba(26, 26, 26, 0.9) 100%)',
+            boxShadow: `
+              0 0 20px var(--accent-glow),
+              0 0 40px rgba(0, 102, 255, 0.2),
+              inset 0 0 30px rgba(0, 102, 255, 0.1)
+            `,
+            position: 'relative'
           }}>
             {messages.map((message, index) => (
               <div
