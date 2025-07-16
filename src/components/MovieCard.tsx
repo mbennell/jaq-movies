@@ -14,10 +14,17 @@ interface MovieCardProps {
     jaqNotes?: string
     enthusiasmLevel?: number
   }
+  onViewDetails?: (movieId: string | number) => void
 }
 
-export default function MovieCard({ movie }: MovieCardProps) {
+export default function MovieCard({ movie, onViewDetails }: MovieCardProps) {
   const [isHovered, setIsHovered] = useState(false)
+
+  const handleClick = () => {
+    if (onViewDetails) {
+      onViewDetails(movie.id)
+    }
+  }
 
   const getYear = (dateString?: string) => {
     if (!dateString) return 'Unknown'
@@ -49,6 +56,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={handleClick}
     >
       {/* Poster Section - 60% of card height */}
       <div style={{

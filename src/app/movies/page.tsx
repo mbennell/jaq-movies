@@ -8,6 +8,28 @@ import MovieCard from '../../components/MovieCard'
 import FadeInSection from '../../components/FadeInSection'
 import Hero from '../../components/Hero'
 import ScrollIndicator from '../../components/ScrollIndicator'
+import MovieDetailsModal from '../../components/MovieDetailsModal'
+
+interface MovieDetails {
+  id: string | number
+  title: string
+  overview: string
+  release_date: string
+  poster_path: string
+  backdrop_path?: string
+  vote_average: number
+  runtime?: number
+  genres?: { id: number; name: string }[]
+  cast?: { id: number; name: string; character: string; profile_path?: string }[]
+  crew?: { id: number; name: string; job: string }[]
+  jaqNotes?: string
+  enthusiasmLevel?: number
+  streaming_providers?: {
+    flatrate?: { provider_id: number; provider_name: string; logo_path: string }[]
+    rent?: { provider_id: number; provider_name: string; logo_path: string }[]
+    buy?: { provider_id: number; provider_name: string; logo_path: string }[]
+  }
+}
 
 interface Movie {
   id: string | number
@@ -26,6 +48,9 @@ function MoviesContent() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const [selectedMovie, setSelectedMovie] = useState<MovieDetails | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [modalLoading, setModalLoading] = useState(false)
   const searchParams = useSearchParams()
 
   const loadMovies = async () => {
@@ -66,6 +91,33 @@ function MoviesContent() {
 
   const handleSearch = (query: string) => {
     setSearchQuery(query)
+  }
+
+  const handleViewDetails = async (movieId: string | number) => {
+    try {
+      setModalLoading(true)
+      setIsModalOpen(true)
+      
+      const response = await fetch(`/api/movies/${movieId}/details`)
+      const data = await response.json()
+      
+      if (data.success) {
+        setSelectedMovie(data.movie)
+      } else {
+        console.error('Failed to load movie details:', data.error)
+        setIsModalOpen(false)
+      }
+    } catch (error) {
+      console.error('Error loading movie details:', error)
+      setIsModalOpen(false)
+    } finally {
+      setModalLoading(false)
+    }
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+    setSelectedMovie(null)
   }
 
   return (
@@ -229,7 +281,7 @@ function MoviesContent() {
               <div id="movies-grid" className="movie-grid">
                 {filteredMovies.map((movie, index) => (
                   <FadeInSection key={movie.id} delay={300 + (index * 50)}>
-                    <MovieCard movie={movie} />
+                    <MovieCard movie={movie} onViewDetails={handleViewDetails} />
                   </FadeInSection>
                 ))}
               </div>
@@ -237,6 +289,33 @@ function MoviesContent() {
           )}
         </div>
       </div>
+
+      {/* Movie Details Modal */}
+      <MovieDetailsModal
+        movie={selectedMovie}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      />
+      
+      {/* Loading overlay for modal */}
+      {modalLoading && isModalOpen && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.9)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 2500,
+          color: 'var(--text-primary)',
+          fontSize: 'var(--font-size-xl)'
+        }}>
+          Loading movie details...
+        </div>
+      )}
     </div>
   )
 }
