@@ -2,7 +2,15 @@ import Link from 'next/link'
 
 export default function Hero() {
   return (
-    <section className="hero-section">
+    <section 
+      className="hero-section"
+      style={{
+        backgroundImage: 'url(/images/jaq-movie-hero1.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
       <div className="hero-overlay"></div>
       <div className="hero-content">
         <h1 style={{ 
