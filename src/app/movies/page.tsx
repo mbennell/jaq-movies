@@ -74,7 +74,6 @@ function MoviesContent() {
       
       <div style={{ height: '60vh', position: 'relative' }}>
         <Hero />
-        <ScrollIndicator targetId="movies-section" />
       </div>
       
       <div 
@@ -106,6 +105,16 @@ function MoviesContent() {
           }}>
             {loading ? 'Loading...' : `${filteredMovies.length} of ${movies.length} movies`}
           </p>
+
+          {!loading && movies.length > 0 && (
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'center',
+              marginBottom: 'var(--spacing-2xl)'
+            }}>
+              <ScrollIndicator targetId="movies-grid" />
+            </div>
+          )}
 
           <SearchBar 
             onSearch={handleSearch}
@@ -217,7 +226,7 @@ function MoviesContent() {
           {/* Movies Grid */}
           {filteredMovies.length > 0 && (
             <FadeInSection delay={200}>
-              <div className="movie-grid">
+              <div id="movies-grid" className="movie-grid">
                 {filteredMovies.map((movie, index) => (
                   <FadeInSection key={movie.id} delay={300 + (index * 50)}>
                     <MovieCard movie={movie} />
