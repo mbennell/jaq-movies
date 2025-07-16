@@ -7,6 +7,7 @@ import SearchBar from '../../components/SearchBar'
 import MovieCard from '../../components/MovieCard'
 import FadeInSection from '../../components/FadeInSection'
 import Hero from '../../components/Hero'
+import ScrollIndicator from '../../components/ScrollIndicator'
 
 interface Movie {
   id: string | number
@@ -73,13 +74,17 @@ function MoviesContent() {
       
       <div style={{ height: '60vh', position: 'relative' }}>
         <Hero />
+        <ScrollIndicator targetId="movies-section" />
       </div>
       
-      <div style={{ 
-        backgroundColor: 'var(--bg-primary)',
-        minHeight: '100vh',
-        paddingTop: 'var(--spacing-2xl)'
-      }}>
+      <div 
+        id="movies-section"
+        style={{ 
+          backgroundColor: 'var(--bg-primary)',
+          minHeight: '100vh',
+          paddingTop: 'var(--spacing-2xl)'
+        }}
+      >
         <div className="container">
           <h1 style={{ 
             fontSize: 'var(--font-size-4xl)',
