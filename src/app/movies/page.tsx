@@ -1,8 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import Image from 'next/image'
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Navigation from '../../components/Navigation'
+import SearchBar from '../../components/SearchBar'
+import MovieCard from '../../components/MovieCard'
+import FadeInSection from '../../components/FadeInSection'
 
 interface Movie {
   id: string | number
@@ -16,11 +19,12 @@ interface Movie {
   enthusiasmLevel?: number
 }
 
-export default function MoviesPage() {
+function MoviesContent() {
   const [movies, setMovies] = useState<Movie[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const searchParams = useSearchParams()
 
   const loadMovies = async () => {
     try {
@@ -45,18 +49,21 @@ export default function MoviesPage() {
 
   useEffect(() => {
     loadMovies()
-  }, [])
+    
+    // Get search query from URL if present
+    const urlSearch = searchParams.get('search')
+    if (urlSearch) {
+      setSearchQuery(urlSearch)
+    }
+  }, [searchParams])
 
   const filteredMovies = movies.filter(movie =>
-    movie.title.toLowerCase().includes(searchQuery.toLowerCase())
+    movie.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    movie.overview.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  const getEnthusiasmEmoji = (level?: number) => {
-    if (!level) return '⭐'
-    if (level >= 5) return '🔥'
-    if (level >= 4) return '⭐⭐⭐'
-    if (level >= 3) return '⭐⭐'
-    return '⭐'
+  const handleSearch = (query: string) => {
+    setSearchQuery(query)
   }
 
   return (
@@ -64,197 +71,176 @@ export default function MoviesPage() {
       <Navigation />
       
       <div style={{ 
-        maxWidth: '1200px', 
-        margin: '0 auto', 
-        padding: '2rem' 
+        backgroundColor: 'var(--bg-primary)',
+        minHeight: '100vh',
+        paddingTop: 'var(--spacing-2xl)'
       }}>
-        <h1 style={{ 
-          fontSize: '2.5rem', 
-          marginBottom: '2rem',
-          textAlign: 'center',
-          color: '#333'
-        }}>
-          🎬 Movie Collection ({movies.length})
-        </h1>
+        <div className="container">
+          <h1 style={{ 
+            fontSize: 'var(--font-size-4xl)',
+            fontWeight: '700',
+            textTransform: 'uppercase',
+            letterSpacing: '-0.01em',
+            textAlign: 'center',
+            marginBottom: 'var(--spacing-xl)',
+            color: 'var(--text-primary)'
+          }}>
+            Movie Collection
+          </h1>
+          
+          <p style={{
+            fontSize: 'var(--font-size-lg)',
+            textAlign: 'center',
+            marginBottom: 'var(--spacing-2xl)',
+            color: 'var(--text-secondary)'
+          }}>
+            {loading ? 'Loading...' : `${filteredMovies.length} of ${movies.length} movies`}
+          </p>
 
-        {/* Search */}
-        <div style={{ marginBottom: '2rem' }}>
-          <input
-            type="text"
-            placeholder="Search movies..."
+          <SearchBar 
+            onSearch={handleSearch}
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{
-              width: '100%',
-              padding: '1rem',
-              fontSize: '1.1rem',
-              border: '2px solid #ddd',
-              borderRadius: '8px',
-              boxSizing: 'border-box'
-            }}
+            onChange={setSearchQuery}
           />
-        </div>
 
-        {loading && (
-          <div style={{ 
-            textAlign: 'center', 
-            padding: '3rem',
-            fontSize: '1.2rem',
-            color: '#666'
-          }}>
-            Loading movies...
-          </div>
-        )}
+          {loading && (
+            <div style={{ 
+              textAlign: 'center', 
+              padding: 'var(--spacing-4xl)',
+              color: 'var(--text-secondary)'
+            }}>
+              <div style={{
+                fontSize: 'var(--font-size-xl)',
+                marginBottom: 'var(--spacing-md)'
+              }}>
+                Loading movies...
+              </div>
+            </div>
+          )}
 
-        {error && (
-          <div style={{ 
-            backgroundColor: '#ffe6e6',
-            border: '1px solid #ffcccc',
-            padding: '1rem',
-            borderRadius: '8px',
-            marginBottom: '2rem',
-            textAlign: 'center'
-          }}>
-            <h3 style={{ color: '#cc0000', marginBottom: '0.5rem' }}>Error Loading Movies</h3>
-            <p style={{ color: '#666' }}>{error}</p>
-            <button 
-              onClick={loadMovies}
-              style={{
-                backgroundColor: '#0066cc',
-                color: 'white',
-                border: 'none',
-                padding: '0.5rem 1rem',
-                borderRadius: '4px',
-                marginTop: '1rem',
-                cursor: 'pointer'
-              }}
-            >
-              Try Again
-            </button>
-          </div>
-        )}
-
-        {!loading && movies.length === 0 && !error && (
-          <div style={{ 
-            textAlign: 'center', 
-            padding: '3rem',
-            backgroundColor: '#f8f9fa',
-            borderRadius: '8px',
-            border: '1px solid #e9ecef'
-          }}>
-            <h3 style={{ color: '#666', marginBottom: '1rem' }}>No Movies Found</h3>
-            <p style={{ color: '#999' }}>
-              Import Jaq&apos;s collection from the <a href="/admin" style={{ color: '#0066cc' }}>Admin panel</a>
-            </p>
-          </div>
-        )}
-
-        {/* Movies Grid */}
-        {filteredMovies.length > 0 && (
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-            gap: '2rem'
-          }}>
-            {filteredMovies.map((movie) => (
-              <div
-                key={movie.id}
+          {error && (
+            <div style={{ 
+              backgroundColor: 'var(--error)',
+              color: 'white',
+              padding: 'var(--spacing-lg)',
+              borderRadius: 'var(--border-radius-lg)',
+              marginBottom: 'var(--spacing-xl)',
+              textAlign: 'center'
+            }}>
+              <h3 style={{ 
+                fontSize: 'var(--font-size-xl)',
+                marginBottom: 'var(--spacing-sm)'
+              }}>
+                Error Loading Movies
+              </h3>
+              <p style={{ 
+                marginBottom: 'var(--spacing-md)',
+                color: 'rgba(255, 255, 255, 0.9)'
+              }}>
+                {error}
+              </p>
+              <button 
+                onClick={loadMovies}
+                className="btn btn-primary"
                 style={{
-                  border: '1px solid #ddd',
-                  borderRadius: '8px',
-                  overflow: 'hidden',
                   backgroundColor: 'white',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                  color: 'var(--error)'
                 }}
               >
-                {/* Movie Poster */}
-                <div style={{
-                  height: '200px',
-                  backgroundColor: '#f0f0f0',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  overflow: 'hidden',
-                  position: 'relative'
-                }}>
-                  {movie.poster_path ? (
-                    <Image
-                      src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                      alt={movie.title}
-                      fill
-                      style={{
-                        objectFit: 'cover'
-                      }}
-                    />
-                  ) : (
-                    <span style={{ fontSize: '3rem' }}>📽️</span>
-                  )}
-                </div>
-                
-                {/* Movie Info */}
-                <div style={{ padding: '1rem' }}>
-                  <h3 style={{ 
-                    margin: '0 0 0.5rem 0',
-                    fontSize: '1.2rem',
-                    color: '#333'
-                  }}>
-                    {movie.title}
-                  </h3>
-                  
-                  <div style={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginBottom: '0.5rem'
-                  }}>
-                    <span style={{ color: '#666' }}>
-                      {movie.release_date ? new Date(movie.release_date).getFullYear() : 'Unknown'}
-                    </span>
-                    <span style={{ fontSize: '1.2rem' }}>
-                      {getEnthusiasmEmoji(movie.enthusiasmLevel)}
-                    </span>
-                  </div>
-                  
-                  {movie.vote_average > 0 && (
-                    <div style={{ 
-                      marginBottom: '0.5rem',
-                      fontSize: '0.9rem',
-                      color: '#666'
-                    }}>
-                      TMDB: ⭐ {movie.vote_average.toFixed(1)}
-                    </div>
-                  )}
-                  
-                  {movie.jaqNotes && (
-                    <div style={{
-                      backgroundColor: '#e8f4f8',
-                      padding: '0.5rem',
-                      borderRadius: '4px',
-                      fontSize: '0.9rem',
-                      color: '#0066cc',
-                      marginBottom: '0.5rem'
-                    }}>
-                      💭 {movie.jaqNotes}
-                    </div>
-                  )}
-                  
-                  <p style={{ 
-                    margin: '0',
-                    fontSize: '0.9rem',
-                    color: '#666',
-                    lineHeight: '1.4'
-                  }}>
-                    {movie.overview.length > 150 
-                      ? movie.overview.substring(0, 150) + '...'
-                      : movie.overview
-                    }
-                  </p>
-                </div>
+                Try Again
+              </button>
+            </div>
+          )}
+
+          {!loading && movies.length === 0 && !error && (
+            <div style={{ 
+              textAlign: 'center', 
+              padding: 'var(--spacing-4xl)',
+              backgroundColor: 'var(--bg-secondary)',
+              borderRadius: 'var(--border-radius-lg)',
+              color: 'var(--text-secondary)'
+            }}>
+              <h3 style={{ 
+                fontSize: 'var(--font-size-xl)',
+                marginBottom: 'var(--spacing-md)',
+                color: 'var(--text-primary)'
+              }}>
+                No Movies Found
+              </h3>
+              <p>
+                Import Jaq&apos;s collection from the{' '}
+                <a href="/admin" style={{ color: 'var(--accent-primary)' }}>
+                  Admin panel
+                </a>
+              </p>
+            </div>
+          )}
+
+          {!loading && searchQuery && filteredMovies.length === 0 && movies.length > 0 && (
+            <div style={{ 
+              textAlign: 'center', 
+              padding: 'var(--spacing-4xl)',
+              backgroundColor: 'var(--bg-secondary)',
+              borderRadius: 'var(--border-radius-lg)',
+              color: 'var(--text-secondary)'
+            }}>
+              <h3 style={{ 
+                fontSize: 'var(--font-size-xl)',
+                marginBottom: 'var(--spacing-md)',
+                color: 'var(--text-primary)'
+              }}>
+                No Results Found
+              </h3>
+              <p>
+                No movies match your search for &quot;{searchQuery}&quot;
+              </p>
+              <button 
+                onClick={() => setSearchQuery('')}
+                className="btn btn-primary"
+                style={{ marginTop: 'var(--spacing-md)' }}
+              >
+                Clear Search
+              </button>
+            </div>
+          )}
+
+          {/* Movies Grid */}
+          {filteredMovies.length > 0 && (
+            <FadeInSection delay={200}>
+              <div className="movie-grid">
+                {filteredMovies.map((movie, index) => (
+                  <FadeInSection key={movie.id} delay={300 + (index * 50)}>
+                    <MovieCard movie={movie} />
+                  </FadeInSection>
+                ))}
               </div>
-            ))}
-          </div>
-        )}
+            </FadeInSection>
+          )}
+        </div>
       </div>
     </div>
+  )
+}
+
+export default function MoviesPage() {
+  return (
+    <Suspense fallback={
+      <div style={{ 
+        backgroundColor: 'var(--bg-primary)', 
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <div style={{
+          color: 'var(--text-primary)',
+          fontSize: 'var(--font-size-lg)'
+        }}>
+          Loading movies...
+        </div>
+      </div>
+    }>
+      <MoviesContent />
+    </Suspense>
   )
 }

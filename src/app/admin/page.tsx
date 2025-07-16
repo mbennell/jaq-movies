@@ -77,43 +77,48 @@ export default function AdminPage() {
   }
 
   return (
-    <div>
+    <div style={{ backgroundColor: 'var(--bg-primary)', minHeight: '100vh' }}>
       <Navigation />
       
-      <div style={{ 
-        maxWidth: '800px', 
-        margin: '0 auto', 
-        padding: '2rem' 
+      <div className="content-container" style={{ 
+        paddingTop: 'var(--spacing-2xl)',
+        paddingBottom: 'var(--spacing-2xl)'
       }}>
         <h1 style={{ 
-          fontSize: '2.5rem', 
-          marginBottom: '2rem',
+          fontSize: 'var(--font-size-4xl)', 
+          fontWeight: '700',
+          textTransform: 'uppercase',
+          letterSpacing: '-0.01em',
           textAlign: 'center',
-          color: '#333'
+          marginBottom: 'var(--spacing-2xl)',
+          color: 'var(--text-primary)'
         }}>
           🔧 Admin Panel
         </h1>
         
         {/* Migration Section */}
         <div style={{
-          backgroundColor: 'white',
-          border: '1px solid #ddd',
-          borderRadius: '8px',
-          padding: '2rem',
-          marginBottom: '2rem'
+          backgroundColor: 'var(--bg-card)',
+          border: '1px solid var(--bg-secondary)',
+          borderRadius: 'var(--border-radius-lg)',
+          padding: 'var(--spacing-2xl)',
+          marginBottom: 'var(--spacing-2xl)',
+          boxShadow: 'var(--shadow-lg)'
         }}>
           <h2 style={{ 
-            fontSize: '1.5rem', 
-            marginBottom: '1rem',
-            color: '#333'
+            fontSize: 'var(--font-size-2xl)', 
+            fontWeight: '600',
+            marginBottom: 'var(--spacing-lg)',
+            color: 'var(--text-dark)'
           }}>
             Database Migration
           </h2>
           
           <p style={{ 
-            color: '#666', 
-            marginBottom: '2rem',
-            lineHeight: '1.6'
+            color: 'var(--text-muted)', 
+            marginBottom: 'var(--spacing-2xl)',
+            lineHeight: '1.6',
+            fontSize: 'var(--font-size-base)'
           }}>
             Run this first if imports are failing due to missing database columns.
             This will add any missing fields to the production database.
@@ -123,14 +128,28 @@ export default function AdminPage() {
             onClick={runMigration}
             disabled={migrateStatus === 'loading'}
             style={{
-              backgroundColor: migrateStatus === 'loading' ? '#ccc' : '#ff9800',
+              backgroundColor: migrateStatus === 'loading' ? 'var(--bg-secondary)' : 'var(--warning)',
               color: 'white',
               border: 'none',
-              padding: '1rem 2rem',
-              fontSize: '1.1rem',
-              borderRadius: '8px',
+              padding: 'var(--spacing-lg) var(--spacing-2xl)',
+              fontSize: 'var(--font-size-base)',
+              fontWeight: '600',
+              borderRadius: 'var(--border-radius)',
               cursor: migrateStatus === 'loading' ? 'not-allowed' : 'pointer',
-              marginBottom: '1rem'
+              marginBottom: 'var(--spacing-lg)',
+              transition: 'all var(--transition-normal)'
+            }}
+            onMouseEnter={(e) => {
+              if (migrateStatus !== 'loading') {
+                e.currentTarget.style.transform = 'translateY(-2px)'
+                e.currentTarget.style.boxShadow = 'var(--shadow-lg)'
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (migrateStatus !== 'loading') {
+                e.currentTarget.style.transform = 'translateY(0)'
+                e.currentTarget.style.boxShadow = 'none'
+              }
             }}
           >
             {migrateStatus === 'loading' ? 'Migrating...' : 'Run Database Migration'}
@@ -138,13 +157,23 @@ export default function AdminPage() {
           
           {migrateStatus === 'success' && migrateResults && (
             <div style={{
-              backgroundColor: '#e8f5e8',
-              border: '1px solid #4caf50',
-              borderRadius: '4px',
-              padding: '1rem'
+              backgroundColor: 'var(--success)',
+              color: 'white',
+              borderRadius: 'var(--border-radius)',
+              padding: 'var(--spacing-lg)'
             }}>
-              <h3 style={{ color: '#2e7d32', marginBottom: '0.5rem' }}>✅ Migration Successful!</h3>
-              <p style={{ fontSize: '0.9rem', color: '#666' }}>
+              <h3 style={{ 
+                marginBottom: 'var(--spacing-sm)',
+                fontSize: 'var(--font-size-lg)',
+                fontWeight: '600'
+              }}>
+                ✅ Migration Successful!
+              </h3>
+              <p style={{ 
+                fontSize: 'var(--font-size-sm)', 
+                color: 'rgba(255, 255, 255, 0.9)',
+                margin: 0
+              }}>
                 Database is now ready for imports. Movies: {migrateResults.stats?.movies || 0}, 
                 Recommendations: {migrateResults.stats?.recommendations || 0}
               </p>
@@ -153,13 +182,23 @@ export default function AdminPage() {
           
           {migrateStatus === 'error' && (
             <div style={{
-              backgroundColor: '#ffe6e6',
-              border: '1px solid #f44336',
-              borderRadius: '4px',
-              padding: '1rem'
+              backgroundColor: 'var(--error)',
+              color: 'white',
+              borderRadius: 'var(--border-radius)',
+              padding: 'var(--spacing-lg)'
             }}>
-              <h3 style={{ color: '#c62828', marginBottom: '0.5rem' }}>❌ Migration Failed</h3>
-              <p style={{ fontSize: '0.9rem', color: '#666' }}>
+              <h3 style={{ 
+                marginBottom: 'var(--spacing-sm)',
+                fontSize: 'var(--font-size-lg)',
+                fontWeight: '600'
+              }}>
+                ❌ Migration Failed
+              </h3>
+              <p style={{ 
+                fontSize: 'var(--font-size-sm)', 
+                color: 'rgba(255, 255, 255, 0.9)',
+                margin: 0
+              }}>
                 {migrateResults?.error || 'Unknown error occurred'}
               </p>
             </div>
@@ -168,24 +207,27 @@ export default function AdminPage() {
         
         {/* Import Section */}
         <div style={{
-          backgroundColor: 'white',
-          border: '1px solid #ddd',
-          borderRadius: '8px',
-          padding: '2rem',
-          marginBottom: '2rem'
+          backgroundColor: 'var(--bg-card)',
+          border: '1px solid var(--bg-secondary)',
+          borderRadius: 'var(--border-radius-lg)',
+          padding: 'var(--spacing-2xl)',
+          marginBottom: 'var(--spacing-2xl)',
+          boxShadow: 'var(--shadow-lg)'
         }}>
           <h2 style={{ 
-            fontSize: '1.5rem', 
-            marginBottom: '1rem',
-            color: '#333'
+            fontSize: 'var(--font-size-2xl)', 
+            fontWeight: '600',
+            marginBottom: 'var(--spacing-lg)',
+            color: 'var(--text-dark)'
           }}>
             Import Jaq&apos;s Collection
           </h2>
           
           <p style={{ 
-            color: '#666', 
-            marginBottom: '2rem',
-            lineHeight: '1.6'
+            color: 'var(--text-muted)', 
+            marginBottom: 'var(--spacing-2xl)',
+            lineHeight: '1.6',
+            fontSize: 'var(--font-size-base)'
           }}>
             This will import all 42 movies/series from Jaq&apos;s Notion collection, 
             enrich them with TMDB data, and add them to the database.
@@ -194,15 +236,14 @@ export default function AdminPage() {
           <button 
             onClick={runImport}
             disabled={importStatus === 'loading'}
+            className="btn btn-primary"
             style={{
-              backgroundColor: importStatus === 'loading' ? '#ccc' : '#0066cc',
-              color: 'white',
-              border: 'none',
-              padding: '1rem 2rem',
-              fontSize: '1.1rem',
-              borderRadius: '8px',
-              cursor: importStatus === 'loading' ? 'not-allowed' : 'pointer',
-              marginBottom: '1rem'
+              backgroundColor: importStatus === 'loading' ? 'var(--bg-secondary)' : 'var(--accent-primary)',
+              padding: 'var(--spacing-lg) var(--spacing-2xl)',
+              fontSize: 'var(--font-size-base)',
+              fontWeight: '600',
+              marginBottom: 'var(--spacing-lg)',
+              cursor: importStatus === 'loading' ? 'not-allowed' : 'pointer'
             }}
           >
             {importStatus === 'loading' ? 'Importing...' : 'Import Collection'}
@@ -211,37 +252,49 @@ export default function AdminPage() {
           {/* Results */}
           {importStatus === 'success' && importResults?.results && (
             <div style={{
-              backgroundColor: importResults.results.successful > 0 ? '#e8f5e8' : '#ffe6e6',
-              border: `1px solid ${importResults.results.successful > 0 ? '#4caf50' : '#f44336'}`,
-              borderRadius: '4px',
-              padding: '1rem'
+              backgroundColor: importResults.results.successful > 0 ? 'var(--success)' : 'var(--warning)',
+              color: 'white',
+              borderRadius: 'var(--border-radius)',
+              padding: 'var(--spacing-lg)'
             }}>
               <h3 style={{ 
-                color: importResults.results.successful > 0 ? '#2e7d32' : '#c62828', 
-                marginBottom: '0.5rem' 
+                marginBottom: 'var(--spacing-sm)',
+                fontSize: 'var(--font-size-lg)',
+                fontWeight: '600'
               }}>
                 {importResults.results.successful > 0 ? '✅ Import Successful!' : '⚠️ Import Issues'}
               </h3>
-              <div style={{ fontSize: '0.9rem', color: '#666' }}>
-                <p>Processed: {importResults.results.processed}</p>
-                <p>Successful: {importResults.results.successful}</p>
-                <p>Failed: {importResults.results.failed}</p>
+              <div style={{ 
+                fontSize: 'var(--font-size-sm)', 
+                color: 'rgba(255, 255, 255, 0.9)',
+                marginBottom: 'var(--spacing-sm)'
+              }}>
+                <p style={{ margin: '0 0 var(--spacing-xs) 0' }}>Processed: {importResults.results.processed}</p>
+                <p style={{ margin: '0 0 var(--spacing-xs) 0' }}>Successful: {importResults.results.successful}</p>
+                <p style={{ margin: '0' }}>Failed: {importResults.results.failed}</p>
               </div>
               
               {/* Show errors if any failed */}
               {importResults.results.failed > 0 && importResults.errors && (
-                <div style={{ marginTop: '1rem' }}>
-                  <h4 style={{ color: '#c62828', marginBottom: '0.5rem' }}>Sample Errors:</h4>
+                <div style={{ marginTop: 'var(--spacing-md)' }}>
+                  <h4 style={{ 
+                    marginBottom: 'var(--spacing-sm)',
+                    fontSize: 'var(--font-size-base)',
+                    fontWeight: '600'
+                  }}>
+                    Sample Errors:
+                  </h4>
                   <div style={{
-                    backgroundColor: '#f5f5f5',
-                    padding: '0.5rem',
-                    borderRadius: '4px',
-                    fontSize: '0.8rem',
+                    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                    padding: 'var(--spacing-sm)',
+                    borderRadius: 'var(--border-radius)',
+                    fontSize: 'var(--font-size-xs)',
                     maxHeight: '200px',
-                    overflowY: 'auto'
+                    overflowY: 'auto',
+                    fontFamily: 'monospace'
                   }}>
                     {importResults.errors.map((error, index) => (
-                      <div key={index} style={{ marginBottom: '0.25rem' }}>
+                      <div key={index} style={{ marginBottom: 'var(--spacing-xs)' }}>
                         {error}
                       </div>
                     ))}
@@ -253,18 +306,26 @@ export default function AdminPage() {
           
           {importStatus === 'error' && (
             <div style={{
-              backgroundColor: '#ffe6e6',
-              border: '1px solid #f44336',
-              borderRadius: '4px',
-              padding: '1rem'
+              backgroundColor: 'var(--error)',
+              color: 'white',
+              borderRadius: 'var(--border-radius)',
+              padding: 'var(--spacing-lg)'
             }}>
-              <h3 style={{ color: '#c62828', marginBottom: '0.5rem' }}>❌ Import Failed</h3>
+              <h3 style={{ 
+                marginBottom: 'var(--spacing-sm)',
+                fontSize: 'var(--font-size-lg)',
+                fontWeight: '600'
+              }}>
+                ❌ Import Failed
+              </h3>
               <pre style={{ 
-                fontSize: '0.8rem', 
-                backgroundColor: '#f5f5f5',
-                padding: '0.5rem',
-                borderRadius: '4px',
-                overflow: 'auto'
+                fontSize: 'var(--font-size-xs)', 
+                backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                padding: 'var(--spacing-sm)',
+                borderRadius: 'var(--border-radius)',
+                overflow: 'auto',
+                color: 'rgba(255, 255, 255, 0.9)',
+                margin: 0
               }}>
                 {JSON.stringify(importResults, null, 2)}
               </pre>
@@ -274,30 +335,32 @@ export default function AdminPage() {
         
         {/* Quick Links */}
         <div style={{
-          backgroundColor: 'white',
-          border: '1px solid #ddd',
-          borderRadius: '8px',
-          padding: '2rem'
+          backgroundColor: 'var(--bg-card)',
+          border: '1px solid var(--bg-secondary)',
+          borderRadius: 'var(--border-radius-lg)',
+          padding: 'var(--spacing-2xl)',
+          boxShadow: 'var(--shadow-lg)'
         }}>
           <h2 style={{ 
-            fontSize: '1.5rem', 
-            marginBottom: '1rem',
-            color: '#333'
+            fontSize: 'var(--font-size-2xl)', 
+            fontWeight: '600',
+            marginBottom: 'var(--spacing-lg)',
+            color: 'var(--text-dark)'
           }}>
             Quick Links
           </h2>
           
-          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 'var(--spacing-lg)', flexWrap: 'wrap' }}>
             <a 
               href="/simple-chat"
               target="_blank"
+              className="btn btn-primary"
               style={{
-                backgroundColor: '#0066cc',
-                color: 'white',
-                padding: '0.75rem 1.5rem',
+                padding: 'var(--spacing-md) var(--spacing-lg)',
+                fontSize: 'var(--font-size-base)',
+                fontWeight: '600',
                 textDecoration: 'none',
-                borderRadius: '4px',
-                fontSize: '1rem'
+                display: 'inline-block'
               }}
             >
               Test AI Chat
@@ -307,12 +370,23 @@ export default function AdminPage() {
               href="/movies"
               target="_blank"
               style={{
-                backgroundColor: '#28a745',
+                backgroundColor: 'var(--success)',
                 color: 'white',
-                padding: '0.75rem 1.5rem',
+                padding: 'var(--spacing-md) var(--spacing-lg)',
                 textDecoration: 'none',
-                borderRadius: '4px',
-                fontSize: '1rem'
+                borderRadius: 'var(--border-radius)',
+                fontSize: 'var(--font-size-base)',
+                fontWeight: '600',
+                transition: 'all var(--transition-normal)',
+                display: 'inline-block'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)'
+                e.currentTarget.style.boxShadow = 'var(--shadow-lg)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)'
+                e.currentTarget.style.boxShadow = 'none'
               }}
             >
               View Movies Page

@@ -1,110 +1,164 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import Navigation from '../components/Navigation'
-import Link from 'next/link'
+import Hero from '../components/Hero'
+import SearchBar from '../components/SearchBar'
+import MovieCard from '../components/MovieCard'
+import FadeInSection from '../components/FadeInSection'
+
+interface Movie {
+  id: string | number
+  title: string
+  overview: string
+  release_date: string
+  poster_path: string
+  vote_average: number
+  jaqNotes?: string
+  enthusiasmLevel?: number
+}
 
 export default function Home() {
+  const [featuredMovies, setFeaturedMovies] = useState<Movie[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const loadFeaturedMovies = async () => {
+      try {
+        const response = await fetch('/api/movies')
+        const data = await response.json()
+        
+        if (data.success) {
+          // Get top 6 movies by enthusiasm level for featured section
+          const topMovies = data.results
+            .filter((movie: Movie) => movie.enthusiasmLevel && movie.enthusiasmLevel >= 4)
+            .sort((a: Movie, b: Movie) => (b.enthusiasmLevel || 0) - (a.enthusiasmLevel || 0))
+            .slice(0, 6)
+          
+          setFeaturedMovies(topMovies)
+        }
+      } catch (error) {
+        console.error('Error loading featured movies:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadFeaturedMovies()
+  }, [])
+
+  const handleSearch = (query: string) => {
+    // Redirect to movies page with search query
+    window.location.href = `/movies?search=${encodeURIComponent(query)}`
+  }
+
   return (
     <div>
-      <Navigation />
+      <Navigation isTransparent={true} />
       
-      <div style={{ 
-        maxWidth: '800px', 
-        margin: '0 auto', 
-        padding: '2rem',
-        textAlign: 'center' 
+      <Hero />
+      
+      <FadeInSection delay={200}>
+        <SearchBar onSearch={handleSearch} />
+      </FadeInSection>
+      
+      {/* Featured Movies Section */}
+      <section style={{
+        padding: 'var(--spacing-4xl) 0',
+        backgroundColor: 'var(--bg-primary)'
       }}>
-        <h1 style={{ 
-          fontSize: '3rem', 
-          marginBottom: '1rem',
-          color: '#333'
-        }}>
-          🎬 Jaq&apos;s Movie Guide
-        </h1>
-        
-        <p style={{ 
-          fontSize: '1.2rem', 
-          marginBottom: '3rem', 
-          color: '#666',
-          lineHeight: '1.6'
-        }}>
-          Get personalized movie recommendations from Jaq&apos;s curated collection. 
-          Chat with our AI assistant or browse the complete library.
-        </p>
-        
-        <div style={{ 
-          display: 'flex', 
-          gap: '1rem', 
-          justifyContent: 'center',
-          flexWrap: 'wrap',
-          marginBottom: '3rem'
-        }}>
-          <Link href="/simple-chat" style={{
-            backgroundColor: '#0066cc',
-            color: 'white',
-            padding: '1rem 2rem',
-            textDecoration: 'none',
-            borderRadius: '8px',
-            fontSize: '1.1rem',
-            fontWeight: 'bold'
-          }}>
-            💬 Start AI Chat
-          </Link>
+        <div className="container">
+          <FadeInSection delay={300}>
+            <h2 style={{
+              fontSize: 'var(--font-size-3xl)',
+              fontWeight: '700',
+              textTransform: 'uppercase',
+              letterSpacing: '-0.01em',
+              textAlign: 'center',
+              marginBottom: 'var(--spacing-xl)',
+              color: 'var(--text-primary)'
+            }}>
+              Featured Films
+            </h2>
+            
+            <p style={{
+              fontSize: 'var(--font-size-lg)',
+              textAlign: 'center',
+              marginBottom: 'var(--spacing-2xl)',
+              color: 'var(--text-secondary)',
+              maxWidth: '600px',
+              margin: '0 auto var(--spacing-2xl)'
+            }}>
+              Hand-picked favourites from Jaq&apos;s collection
+            </p>
+          </FadeInSection>
           
-          <Link href="/movies" style={{
-            backgroundColor: '#28a745',
-            color: 'white',
-            padding: '1rem 2rem',
-            textDecoration: 'none',
-            borderRadius: '8px',
-            fontSize: '1.1rem',
-            fontWeight: 'bold'
-          }}>
-            📚 Browse Movies
-          </Link>
+          {loading ? (
+            <FadeInSection delay={400}>
+              <div style={{
+                textAlign: 'center',
+                padding: 'var(--spacing-4xl)',
+                color: 'var(--text-secondary)'
+              }}>
+                Loading featured movies...
+              </div>
+            </FadeInSection>
+          ) : featuredMovies.length > 0 ? (
+            <FadeInSection delay={500}>
+              <div className="movie-grid">
+                {featuredMovies.map((movie, index) => (
+                  <FadeInSection key={movie.id} delay={600 + (index * 100)}>
+                    <MovieCard movie={movie} />
+                  </FadeInSection>
+                ))}
+              </div>
+            </FadeInSection>
+          ) : (
+            <FadeInSection delay={400}>
+              <div style={{
+                textAlign: 'center',
+                padding: 'var(--spacing-4xl)',
+                backgroundColor: 'var(--bg-secondary)',
+                borderRadius: 'var(--border-radius-lg)',
+                color: 'var(--text-secondary)'
+              }}>
+                <h3 style={{
+                  fontSize: 'var(--font-size-xl)',
+                  marginBottom: 'var(--spacing-md)',
+                  color: 'var(--text-primary)'
+                }}>
+                  No Movies Found
+                </h3>
+                <p>
+                  Import Jaq&apos;s collection from the{' '}
+                  <a href="/admin" style={{ color: 'var(--accent-primary)' }}>
+                    Admin panel
+                  </a>
+                </p>
+              </div>
+            </FadeInSection>
+          )}
         </div>
-        
-        <div style={{ 
-          backgroundColor: '#f8f9fa',
-          padding: '2rem',
-          borderRadius: '8px',
-          border: '1px solid #e9ecef'
+      </section>
+      
+      {/* Footer */}
+      <FadeInSection delay={300}>
+        <footer style={{
+          backgroundColor: 'var(--bg-secondary)',
+          padding: 'var(--spacing-2xl) 0',
+          textAlign: 'center',
+          borderTop: '1px solid var(--bg-primary)'
         }}>
-          <h2 style={{ 
-            fontSize: '1.5rem', 
-            marginBottom: '1rem',
-            color: '#333'
-          }}>
-            What You Can Do:
-          </h2>
-          
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-            gap: '1.5rem',
-            textAlign: 'left'
-          }}>
-            <div>
-              <h3 style={{ color: '#0066cc', marginBottom: '0.5rem' }}>🤖 AI Chat</h3>
-              <p style={{ color: '#666', fontSize: '0.9rem' }}>
-                Ask for recommendations like &quot;I want something sci-fi&quot; or &quot;recommend a good thriller&quot;
-              </p>
-            </div>
-            
-            <div>
-              <h3 style={{ color: '#28a745', marginBottom: '0.5rem' }}>📱 Browse</h3>
-              <p style={{ color: '#666', fontSize: '0.9rem' }}>
-                Explore Jaq&apos;s complete collection with ratings and personal notes
-              </p>
-            </div>
-            
-            <div>
-              <h3 style={{ color: '#ffc107', marginBottom: '0.5rem' }}>⭐ Ratings</h3>
-              <p style={{ color: '#666', fontSize: '0.9rem' }}>
-                See TMDB ratings and Jaq&apos;s personal enthusiasm levels for each movie
-              </p>
-            </div>
+          <div className="container">
+            <p style={{
+              fontSize: 'var(--font-size-sm)',
+              color: 'var(--text-muted)'
+            }}>
+              © 2025 Jaq&apos;s Movie Guide • Terms • Privacy
+            </p>
           </div>
-        </div>
-      </div>
+        </footer>
+      </FadeInSection>
     </div>
   )
 }

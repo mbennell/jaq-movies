@@ -1,0 +1,47 @@
+import Link from 'next/link'
+
+export default function Hero() {
+  return (
+    <section className="hero-section">
+      <div className="hero-overlay"></div>
+      <div className="hero-content">
+        <h1 style={{ 
+          fontSize: 'var(--font-size-6xl)',
+          fontWeight: '700',
+          textTransform: 'uppercase',
+          letterSpacing: '-0.02em',
+          marginBottom: 'var(--spacing-lg)',
+          color: 'var(--text-primary)',
+          textAlign: 'center'
+        }}>
+          Find Your Next<br />Favourite Film
+        </h1>
+        
+        <p style={{ 
+          fontSize: 'var(--font-size-xl)',
+          fontWeight: '400',
+          marginBottom: 'var(--spacing-2xl)',
+          color: 'var(--text-secondary)',
+          textAlign: 'center',
+          maxWidth: '600px'
+        }}>
+          Chat with our AI assistant to get tailored movie picks
+        </p>
+        
+        <Link 
+          href="/simple-chat" 
+          className="btn btn-primary"
+          style={{
+            fontSize: 'var(--font-size-lg)',
+            padding: 'var(--spacing-lg) var(--spacing-2xl)',
+            fontWeight: '600',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px'
+          }}
+        >
+          Start Chatting
+        </Link>
+      </div>
+    </section>
+  )
+}
