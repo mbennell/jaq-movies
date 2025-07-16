@@ -71,6 +71,8 @@ export async function POST(request: NextRequest) {
   try {
     const { message } = await request.json()
     
+    console.log('Fallback chat processing:', message)
+    
     if (!message) {
       return NextResponse.json({
         response: 'Please ask me about movies! Try "recommend a sci-fi movie" or "what should I watch tonight?"',
@@ -78,17 +80,28 @@ export async function POST(request: NextRequest) {
       })
     }
     
-    // Get movies from database
-    const movies = await prisma.movie.findMany({
-      include: {
-        recommendations: {
-          where: { recommendedBy: 'jaq' },
-          orderBy: { enthusiasmLevel: 'desc' }
-        }
-      },
-      take: 20,
-      orderBy: { createdAt: 'desc' }
-    })
+    // Get movies from database with detailed logging
+    let movies = []
+    try {
+      console.log('Attempting to fetch movies from database...')
+      movies = await prisma.movie.findMany({
+        include: {
+          recommendations: {
+            where: { recommendedBy: 'jaq' },
+            orderBy: { enthusiasmLevel: 'desc' }
+          }
+        },
+        take: 20,
+        orderBy: { createdAt: 'desc' }
+      })
+      console.log(`Found ${movies.length} movies in database`)
+    } catch (dbError) {
+      console.error('Database error in fallback:', dbError)
+      return NextResponse.json({
+        response: "I'm having trouble connecting to the movie database. Please check the /movies page to see if data is loaded, or visit the Admin panel to import movies.",
+        status: 'error'
+      }, { status: 200 })
+    }
     
     const movieContext = movies.map(movie => ({
       title: movie.title,
@@ -98,23 +111,30 @@ export async function POST(request: NextRequest) {
       enthusiasmLevel: movie.recommendations[0]?.enthusiasmLevel
     }))
     
+    console.log('Movie context created:', movieContext.length, 'items')
+    
     if (movieContext.length === 0) {
       return NextResponse.json({
-        response: "I don't have any movies loaded yet! Please visit the Admin panel to import Jaq's collection.",
+        response: "I don't have any movies loaded yet! Please visit the Admin panel (/admin) to import Jaq's collection first. You can also check the Movies page to see the current status.",
         status: 'completed'
       })
     }
     
     const response = getRecommendationResponse(message, movieContext)
+    console.log('Generated response:', response)
     
-    // Store conversation
-    await prisma.conversation.create({
-      data: {
-        input: message,
-        intent: 'REQUEST_RECOMMENDATION',
-        response
-      }
-    })
+    // Store conversation (optional, don't fail if this fails)
+    try {
+      await prisma.conversation.create({
+        data: {
+          input: message,
+          intent: 'REQUEST_RECOMMENDATION',
+          response
+        }
+      })
+    } catch (conversationError) {
+      console.warn('Failed to store conversation, but continuing:', conversationError)
+    }
     
     return NextResponse.json({
       response,
@@ -124,7 +144,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Fallback chat error:', error)
     return NextResponse.json({
-      response: 'Sorry, I had trouble processing that. Please try browsing the movies manually!',
+      response: `Sorry, I had trouble processing that (${error instanceof Error ? error.message : 'unknown error'}). Please try browsing the movies manually at /movies!`,
       status: 'error'
     }, { status: 200 })
   }
