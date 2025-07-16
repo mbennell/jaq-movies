@@ -33,7 +33,7 @@ export default function Hero() {
           textAlign: 'center',
           maxWidth: '600px'
         }}>
-          Chat with our AI assistant to get tailored movie picks
+          Chat with Jaq to get tailored movie picks
         </p>
         
         <Link 

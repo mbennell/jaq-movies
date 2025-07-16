@@ -29,13 +29,12 @@ export default function Home() {
         const data = await response.json()
         
         if (data.success) {
-          // Get top 6 movies by enthusiasm level for featured section
-          const topMovies = data.results
-            .filter((movie: Movie) => movie.enthusiasmLevel && movie.enthusiasmLevel >= 4)
-            .sort((a: Movie, b: Movie) => (b.enthusiasmLevel || 0) - (a.enthusiasmLevel || 0))
-            .slice(0, 6)
+          // Get 6 random movies from the collection for featured section
+          const allMovies = data.results || []
+          const shuffled = [...allMovies].sort(() => 0.5 - Math.random())
+          const randomMovies = shuffled.slice(0, 6)
           
-          setFeaturedMovies(topMovies)
+          setFeaturedMovies(randomMovies)
         }
       } catch (error) {
         console.error('Error loading featured movies:', error)
