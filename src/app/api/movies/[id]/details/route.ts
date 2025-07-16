@@ -53,15 +53,19 @@ export async function GET(
     const tmdbId = movie.tmdbId || movie.id
 
     // Fetch detailed movie data from TMDB
-    const [movieDetails, credits, watchProviders] = await Promise.allSettled([
+    const [movieDetails, credits, watchProviders, videos, recommendations] = await Promise.allSettled([
       fetch(`https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${tmdbApiKey}`),
       fetch(`https://api.themoviedb.org/3/movie/${tmdbId}/credits?api_key=${tmdbApiKey}`),
-      fetch(`https://api.themoviedb.org/3/movie/${tmdbId}/watch/providers?api_key=${tmdbApiKey}`)
+      fetch(`https://api.themoviedb.org/3/movie/${tmdbId}/watch/providers?api_key=${tmdbApiKey}`),
+      fetch(`https://api.themoviedb.org/3/movie/${tmdbId}/videos?api_key=${tmdbApiKey}`),
+      fetch(`https://api.themoviedb.org/3/movie/${tmdbId}/recommendations?api_key=${tmdbApiKey}`)
     ])
 
     let tmdbMovie = null
     let tmdbCredits = null
     let tmdbWatchProviders = null
+    let tmdbVideos = null
+    let tmdbRecommendations = null
 
     // Parse TMDB movie details
     if (movieDetails.status === 'fulfilled' && movieDetails.value.ok) {
@@ -76,6 +80,16 @@ export async function GET(
     // Parse TMDB watch providers
     if (watchProviders.status === 'fulfilled' && watchProviders.value.ok) {
       tmdbWatchProviders = await watchProviders.value.json()
+    }
+
+    // Parse TMDB videos (trailers)
+    if (videos.status === 'fulfilled' && videos.value.ok) {
+      tmdbVideos = await videos.value.json()
+    }
+
+    // Parse TMDB recommendations
+    if (recommendations.status === 'fulfilled' && recommendations.value.ok) {
+      tmdbRecommendations = await recommendations.value.json()
     }
 
     // Combine our database data with TMDB data
@@ -95,7 +109,11 @@ export async function GET(
       ).slice(0, 5) || [],
       jaqNotes: movie.recommendations.find(r => r.recommendedBy === 'jaq')?.jaqNotes || null,
       enthusiasmLevel: movie.recommendations.find(r => r.recommendedBy === 'jaq')?.enthusiasmLevel || 3,
-      streaming_providers: tmdbWatchProviders?.results?.US || null
+      streaming_providers: tmdbWatchProviders?.results?.US || null,
+      trailers: tmdbVideos?.results?.filter((video: { type: string; site: string }) => 
+        video.type === 'Trailer' && video.site === 'YouTube'
+      ).slice(0, 3) || [],
+      similar_movies: tmdbRecommendations?.results?.slice(0, 8) || []
     }
 
     return NextResponse.json({

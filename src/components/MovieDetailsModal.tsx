@@ -1,12 +1,28 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
 
 interface StreamingProvider {
   provider_id: number
   provider_name: string
   logo_path: string
+}
+
+interface Trailer {
+  id: string
+  key: string
+  name: string
+  site: string
+  type: string
+}
+
+interface SimilarMovie {
+  id: number
+  title: string
+  poster_path?: string
+  vote_average: number
+  release_date: string
 }
 
 interface MovieDetails {
@@ -28,15 +44,23 @@ interface MovieDetails {
     rent?: StreamingProvider[]
     buy?: StreamingProvider[]
   }
+  trailers?: Trailer[]
+  similar_movies?: SimilarMovie[]
 }
 
 interface MovieDetailsModalProps {
   movie: MovieDetails | null
   isOpen: boolean
   onClose: () => void
+  onSelectMovie?: (movieId: number) => void
 }
 
-export default function MovieDetailsModal({ movie, isOpen, onClose }: MovieDetailsModalProps) {
+export default function MovieDetailsModal({ movie, isOpen, onClose, onSelectMovie }: MovieDetailsModalProps) {
+  const [showTrailer, setShowTrailer] = useState(false)
+  const [selectedTrailer, setSelectedTrailer] = useState<Trailer | null>(null)
+  const [personalRating, setPersonalRating] = useState<number>(0)
+  const [isWatchlisted, setIsWatchlisted] = useState<boolean>(false)
+  const [isWatched, setIsWatched] = useState<boolean>(false)
   // Handle escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -163,6 +187,50 @@ export default function MovieDetailsModal({ movie, isOpen, onClose }: MovieDetai
                 </div>
               )}
 
+              {/* Personal Actions */}
+              <div className="personal-actions">
+                <h3>Your Rating & Status</h3>
+                
+                <div className="rating-section">
+                  <h4>Your Rating</h4>
+                  <div className="star-rating">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        className={`star-button ${star <= personalRating ? 'active' : ''}`}
+                        onClick={() => setPersonalRating(star)}
+                      >
+                        ⭐
+                      </button>
+                    ))}
+                    {personalRating > 0 && (
+                      <button
+                        className="clear-rating"
+                        onClick={() => setPersonalRating(0)}
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="status-buttons">
+                  <button
+                    className={`status-button ${isWatchlisted ? 'active' : ''}`}
+                    onClick={() => setIsWatchlisted(!isWatchlisted)}
+                  >
+                    {isWatchlisted ? '❤️ In Watchlist' : '🤍 Add to Watchlist'}
+                  </button>
+                  
+                  <button
+                    className={`status-button ${isWatched ? 'active' : ''}`}
+                    onClick={() => setIsWatched(!isWatched)}
+                  >
+                    {isWatched ? '✅ Watched' : '👁️ Mark as Watched'}
+                  </button>
+                </div>
+              </div>
+
               <div className="modal-overview">
                 <h3>Overview</h3>
                 <p>{movie.overview}</p>
@@ -273,8 +341,95 @@ export default function MovieDetailsModal({ movie, isOpen, onClose }: MovieDetai
               </div>
             </div>
           )}
+
+          {/* Trailers */}
+          {movie.trailers && movie.trailers.length > 0 && (
+            <div className="trailers-section">
+              <h3>Trailers</h3>
+              <div className="trailer-buttons">
+                {movie.trailers.map((trailer) => (
+                  <button
+                    key={trailer.id}
+                    className="trailer-button"
+                    onClick={() => {
+                      setSelectedTrailer(trailer)
+                      setShowTrailer(true)
+                    }}
+                  >
+                    ▶️ {trailer.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Similar Movies */}
+          {movie.similar_movies && movie.similar_movies.length > 0 && (
+            <div className="similar-movies-section">
+              <h3>Movies Like This</h3>
+              <div className="similar-movies-grid">
+                {movie.similar_movies.map((similarMovie) => (
+                  <div
+                    key={similarMovie.id}
+                    className="similar-movie-card"
+                    onClick={() => onSelectMovie && onSelectMovie(similarMovie.id)}
+                  >
+                    {similarMovie.poster_path ? (
+                      <Image
+                        src={`https://image.tmdb.org/t/p/w300${similarMovie.poster_path}`}
+                        alt={similarMovie.title}
+                        width={150}
+                        height={225}
+                        style={{
+                          borderRadius: 'var(--border-radius)',
+                          objectFit: 'cover'
+                        }}
+                      />
+                    ) : (
+                      <div className="similar-movie-placeholder">
+                        <span>🎬</span>
+                      </div>
+                    )}
+                    <div className="similar-movie-info">
+                      <h4>{similarMovie.title}</h4>
+                      <div className="similar-movie-meta">
+                        <span>⭐ {similarMovie.vote_average.toFixed(1)}</span>
+                        <span>{new Date(similarMovie.release_date).getFullYear()}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Trailer Modal */}
+      {showTrailer && selectedTrailer && (
+        <div className="trailer-overlay" onClick={() => setShowTrailer(false)}>
+          <div className="trailer-modal" onClick={(e) => e.stopPropagation()}>
+            <button 
+              className="trailer-close"
+              onClick={() => setShowTrailer(false)}
+              aria-label="Close trailer"
+            >
+              ✕
+            </button>
+            <div className="trailer-container">
+              <iframe
+                width="100%"
+                height="100%"
+                src={`https://www.youtube.com/embed/${selectedTrailer.key}?autoplay=1&rel=0`}
+                title={selectedTrailer.name}
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

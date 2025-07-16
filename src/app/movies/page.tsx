@@ -29,6 +29,8 @@ interface MovieDetails {
     rent?: { provider_id: number; provider_name: string; logo_path: string }[]
     buy?: { provider_id: number; provider_name: string; logo_path: string }[]
   }
+  trailers?: { id: string; key: string; name: string; site: string; type: string }[]
+  similar_movies?: { id: number; title: string; poster_path?: string; vote_average: number; release_date: string }[]
 }
 
 interface Movie {
@@ -118,6 +120,11 @@ function MoviesContent() {
   const handleCloseModal = () => {
     setIsModalOpen(false)
     setSelectedMovie(null)
+  }
+
+  const handleSelectSimilarMovie = async (movieId: number) => {
+    // Close current modal and open new one with the selected similar movie
+    await handleViewDetails(movieId)
   }
 
   return (
@@ -295,6 +302,7 @@ function MoviesContent() {
         movie={selectedMovie}
         isOpen={isModalOpen}
         onClose={handleCloseModal}
+        onSelectMovie={handleSelectSimilarMovie}
       />
       
       {/* Loading overlay for modal */}
