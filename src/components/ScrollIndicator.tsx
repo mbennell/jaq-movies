@@ -46,8 +46,8 @@ export default function ScrollIndicator({ targetId, className = '' }: ScrollIndi
       className={`scroll-indicator ${className}`}
       onClick={handleClick}
       style={{
-        position: 'fixed',
-        bottom: 'var(--spacing-2xl)',
+        position: 'absolute',
+        bottom: 'var(--spacing-3xl)',
         left: '50%',
         transform: 'translateX(-50%)',
         cursor: 'pointer',
