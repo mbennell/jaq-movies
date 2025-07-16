@@ -36,6 +36,7 @@ export default function SimpleChatPage() {
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [recommendations, setRecommendations] = useState<Recommendation[]>([])
+  const [isChatOpen, setIsChatOpen] = useState(false)
 
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return
@@ -115,179 +116,91 @@ export default function SimpleChatPage() {
   }
 
   return (
-    <div style={{ backgroundColor: 'var(--bg-primary)', minHeight: '100vh' }}>
+    <div className="page-container">
       <Navigation isTransparent={true} />
       
-      <div style={{ height: '40vh', position: 'relative' }}>
+      <section className="hero-section-wrapper">
         <Hero />
-      </div>
+      </section>
       
-      <div className="content-container" style={{ 
+      <aside className="content-container" style={{ 
         paddingTop: 'var(--spacing-4xl)',
         paddingBottom: 'var(--spacing-2xl)',
-        position: 'relative',
-        zIndex: 2
+        position: 'relative'
       }}>
         {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: 'var(--spacing-2xl)' }}>
-          <h1 style={{ 
-            fontSize: 'var(--font-size-4xl)', 
-            fontWeight: '700',
-            textTransform: 'uppercase',
-            letterSpacing: '-0.01em',
-            color: 'var(--text-primary)', 
-            marginBottom: 'var(--spacing-lg)'
-          }}>
+        <div className="chat-header">
+          <h1 className="chat-title">
             🤖 AI Movie Chat
           </h1>
-          <p style={{ 
-            fontSize: 'var(--font-size-lg)', 
-            color: 'var(--text-secondary)'
-          }}>
+          <p className="chat-subtitle">
             Ask for recommendations or tell me what you watched!
           </p>
+          <button 
+            onClick={() => setIsChatOpen(!isChatOpen)}
+            className="btn btn-primary"
+            style={{ marginTop: 'var(--spacing-lg)' }}
+          >
+            {isChatOpen ? 'Close Chat' : 'Open Chat'}
+          </button>
         </div>
 
-        {/* Chat Area */}
-        <div style={{ 
-          backgroundColor: 'var(--bg-card)', 
-          border: '1px solid var(--bg-secondary)', 
-          borderRadius: 'var(--border-radius-lg)',
-          padding: 'var(--spacing-xl)',
-          marginBottom: 'var(--spacing-xl)',
-          boxShadow: 'var(--shadow-xl)',
-          background: 'linear-gradient(135deg, var(--bg-card) 0%, rgba(255, 255, 255, 0.95) 100%)'
-        }}>
-          {/* Messages */}
-          <div style={{ 
-            height: '500px', 
-            overflowY: 'auto', 
-            marginBottom: 'var(--spacing-xl)',
-            padding: 'var(--spacing-md)',
-            backgroundColor: 'rgba(17, 17, 17, 0.95)',
-            borderRadius: 'var(--border-radius)',
-            border: '2px solid var(--accent-primary)',
-            backdropFilter: 'blur(15px)',
-            background: 'linear-gradient(135deg, rgba(17, 17, 17, 0.95) 0%, rgba(26, 26, 26, 0.9) 100%)',
-            boxShadow: `
-              0 0 20px var(--accent-glow),
-              0 0 40px rgba(0, 102, 255, 0.2),
-              inset 0 0 30px rgba(0, 102, 255, 0.1)
-            `,
-            position: 'relative'
-          }}>
-            {messages.map((message, index) => (
-              <div
-                key={index}
-                style={{
-                  marginBottom: 'var(--spacing-lg)',
-                  textAlign: message.type === 'user' ? 'right' : 'left'
-                }}
-              >
-                <div
+        {/* Chat Modal */}
+        {isChatOpen && (
+          <div className="chat-modal">
+            <div className="chat-container">
+              {/* Messages */}
+              <div className="chat-messages">
+                {messages.map((message, index) => (
+                  <div key={index} className={`message ${message.type}`}>
+                    <div className={`message-bubble ${message.type}`}>
+                      <div className="message-content">
+                        {message.content}
+                      </div>
+                      <p className="message-time">
+                        {message.timestamp.toLocaleTimeString()}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+                {isLoading && (
+                  <div className="message ai">
+                    <div className="message-bubble ai">
+                      <span>Thinking...</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Input */}
+              <div className="chat-input-container">
+                <input
+                  type="text"
+                  placeholder="What's on your mind about movies?"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  disabled={isLoading}
+                  className="chat-input"
+                />
+                <button
+                  onClick={sendMessage}
+                  disabled={!input.trim() || isLoading}
+                  className="btn btn-primary"
                   style={{
-                    display: 'inline-block',
-                    maxWidth: '70%',
-                    padding: 'var(--spacing-md) var(--spacing-lg)',
-                    borderRadius: 'var(--border-radius-full)',
-                    backgroundColor: message.type === 'user' 
-                      ? 'linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-hover) 100%)'
-                      : 'rgba(255, 255, 255, 0.95)',
-                    background: message.type === 'user' 
-                      ? 'linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-hover) 100%)'
-                      : 'rgba(255, 255, 255, 0.95)',
-                    color: message.type === 'user' ? 'white' : 'var(--text-dark)',
-                    boxShadow: message.type === 'user' 
-                      ? '0 4px 15px rgba(0, 102, 255, 0.3)' 
-                      : '0 2px 10px rgba(0, 0, 0, 0.1)',
-                    border: message.type === 'user' ? 'none' : '1px solid rgba(255, 255, 255, 0.2)',
-                    backdropFilter: 'blur(5px)'
+                    padding: 'var(--spacing-md) var(--spacing-xl)',
+                    fontSize: 'var(--font-size-sm)',
+                    fontWeight: '600',
+                    opacity: (!input.trim() || isLoading) ? 0.5 : 1,
+                    cursor: (!input.trim() || isLoading) ? 'not-allowed' : 'pointer'
                   }}
                 >
-                  <div style={{ 
-                    margin: 0, 
-                    fontSize: 'var(--font-size-sm)',
-                    lineHeight: '1.5'
-                  }}>
-                    {message.content}
-                  </div>
-                  <p style={{ 
-                    margin: 'var(--spacing-xs) 0 0 0', 
-                    fontSize: 'var(--font-size-xs)', 
-                    opacity: 0.7 
-                  }}>
-                    {message.timestamp.toLocaleTimeString()}
-                  </p>
-                </div>
+                  Send
+                </button>
               </div>
-            ))}
-            {isLoading && (
-              <div style={{ textAlign: 'left' }}>
-                <div style={{
-                  display: 'inline-block',
-                  padding: 'var(--spacing-md) var(--spacing-lg)',
-                  borderRadius: 'var(--border-radius-full)',
-                  backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                  color: 'var(--text-dark)',
-                  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  backdropFilter: 'blur(5px)'
-                }}>
-                  <span>Thinking...</span>
-                </div>
-              </div>
-            )}
+            </div>
           </div>
-
-          {/* Input */}
-          <div style={{ display: 'flex', gap: 'var(--spacing-md)' }}>
-            <input
-              type="text"
-              placeholder="What's on your mind about movies?"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={handleKeyPress}
-              disabled={isLoading}
-              style={{
-                flex: 1,
-                padding: 'var(--spacing-md) var(--spacing-lg)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                borderRadius: 'var(--border-radius-full)',
-                fontSize: 'var(--font-size-base)',
-                backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                color: 'var(--text-primary)',
-                outline: 'none',
-                transition: 'all var(--transition-normal)',
-                backdropFilter: 'blur(10px)',
-                boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.1)'
-              }}
-              onFocus={(e) => {
-                e.target.style.borderColor = 'var(--accent-primary)'
-                e.target.style.boxShadow = '0 0 0 3px var(--accent-glow), inset 0 2px 4px rgba(0, 0, 0, 0.1)'
-                e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.12)'
-              }}
-              onBlur={(e) => {
-                e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)'
-                e.target.style.boxShadow = 'inset 0 2px 4px rgba(0, 0, 0, 0.1)'
-                e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.08)'
-              }}
-            />
-            <button
-              onClick={sendMessage}
-              disabled={!input.trim() || isLoading}
-              className="btn btn-primary"
-              style={{
-                padding: 'var(--spacing-md) var(--spacing-xl)',
-                fontSize: 'var(--font-size-sm)',
-                fontWeight: '600',
-                opacity: (!input.trim() || isLoading) ? 0.5 : 1,
-                cursor: (!input.trim() || isLoading) ? 'not-allowed' : 'pointer'
-              }}
-            >
-              Send
-            </button>
-          </div>
-        </div>
+        )}
 
         {/* Recommendations */}
         {recommendations.length > 0 && (
@@ -383,7 +296,7 @@ export default function SimpleChatPage() {
             Import Jaq&apos;s Collection (Admin)
           </a>
         </div>
-      </div>
+      </aside>
     </div>
   )
 }

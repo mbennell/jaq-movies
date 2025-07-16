@@ -7,7 +7,7 @@ interface HeroProps {
 export default function Hero({ backgroundImage = '/images/jaq-movie-hero1.png' }: HeroProps) {
   return (
     <section 
-      className="hero-section"
+      className="hero-section hero-background"
       style={{
         backgroundImage: `url(${backgroundImage})`,
         backgroundSize: 'cover',
