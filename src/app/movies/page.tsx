@@ -6,6 +6,7 @@ import Navigation from '../../components/Navigation'
 import SearchBar from '../../components/SearchBar'
 import MovieCard from '../../components/MovieCard'
 import FadeInSection from '../../components/FadeInSection'
+import Hero from '../../components/Hero'
 
 interface Movie {
   id: string | number
@@ -68,7 +69,11 @@ function MoviesContent() {
 
   return (
     <div>
-      <Navigation />
+      <Navigation isTransparent={true} />
+      
+      <div style={{ height: '60vh', position: 'relative' }}>
+        <Hero />
+      </div>
       
       <div style={{ 
         backgroundColor: 'var(--bg-primary)',

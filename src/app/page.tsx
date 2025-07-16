@@ -55,7 +55,7 @@ export default function Home() {
     <div>
       <Navigation isTransparent={true} />
       
-      <Hero />
+      <Hero backgroundImage="/images/jaq-founder.png" />
       
       <FadeInSection delay={200}>
         <SearchBar onSearch={handleSearch} />

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Navigation from '../../components/Navigation'
+import Hero from '../../components/Hero'
 
 interface ChatMessage {
   type: 'user' | 'ai'
@@ -115,7 +116,11 @@ export default function SimpleChatPage() {
 
   return (
     <div style={{ backgroundColor: 'var(--bg-primary)', minHeight: '100vh' }}>
-      <Navigation />
+      <Navigation isTransparent={true} />
+      
+      <div style={{ height: '60vh', position: 'relative' }}>
+        <Hero />
+      </div>
       
       <div className="content-container" style={{ 
         paddingTop: 'var(--spacing-2xl)',

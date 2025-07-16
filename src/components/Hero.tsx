@@ -1,11 +1,15 @@
 import Link from 'next/link'
 
-export default function Hero() {
+interface HeroProps {
+  backgroundImage?: string
+}
+
+export default function Hero({ backgroundImage = '/images/jaq-movie-hero1.png' }: HeroProps) {
   return (
     <section 
       className="hero-section"
       style={{
-        backgroundImage: 'url(/images/jaq-movie-hero1.png)',
+        backgroundImage: `url(${backgroundImage})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
