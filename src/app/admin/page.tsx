@@ -14,6 +14,13 @@ export default function AdminPage() {
     errors?: string[];
     error?: string;
   } | null>(null)
+  const [migrateStatus, setMigrateStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [migrateResults, setMigrateResults] = useState<{
+    success?: boolean;
+    message?: string;
+    stats?: { movies: number; recommendations: number };
+    error?: string;
+  } | null>(null)
 
   const runImport = async () => {
     setImportStatus('loading')
@@ -42,6 +49,33 @@ export default function AdminPage() {
     }
   }
 
+  const runMigration = async () => {
+    setMigrateStatus('loading')
+    setMigrateResults(null)
+
+    try {
+      const response = await fetch('/api/migrate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      const result = await response.json()
+      
+      if (response.ok) {
+        setMigrateStatus('success')
+        setMigrateResults(result)
+      } else {
+        setMigrateStatus('error')
+        setMigrateResults(result)
+      }
+    } catch {
+      setMigrateStatus('error')
+      setMigrateResults({ error: 'Failed to migrate' })
+    }
+  }
+
   return (
     <div>
       <Navigation />
@@ -59,6 +93,78 @@ export default function AdminPage() {
         }}>
           🔧 Admin Panel
         </h1>
+        
+        {/* Migration Section */}
+        <div style={{
+          backgroundColor: 'white',
+          border: '1px solid #ddd',
+          borderRadius: '8px',
+          padding: '2rem',
+          marginBottom: '2rem'
+        }}>
+          <h2 style={{ 
+            fontSize: '1.5rem', 
+            marginBottom: '1rem',
+            color: '#333'
+          }}>
+            Database Migration
+          </h2>
+          
+          <p style={{ 
+            color: '#666', 
+            marginBottom: '2rem',
+            lineHeight: '1.6'
+          }}>
+            Run this first if imports are failing due to missing database columns.
+            This will add any missing fields to the production database.
+          </p>
+          
+          <button 
+            onClick={runMigration}
+            disabled={migrateStatus === 'loading'}
+            style={{
+              backgroundColor: migrateStatus === 'loading' ? '#ccc' : '#ff9800',
+              color: 'white',
+              border: 'none',
+              padding: '1rem 2rem',
+              fontSize: '1.1rem',
+              borderRadius: '8px',
+              cursor: migrateStatus === 'loading' ? 'not-allowed' : 'pointer',
+              marginBottom: '1rem'
+            }}
+          >
+            {migrateStatus === 'loading' ? 'Migrating...' : 'Run Database Migration'}
+          </button>
+          
+          {migrateStatus === 'success' && migrateResults && (
+            <div style={{
+              backgroundColor: '#e8f5e8',
+              border: '1px solid #4caf50',
+              borderRadius: '4px',
+              padding: '1rem'
+            }}>
+              <h3 style={{ color: '#2e7d32', marginBottom: '0.5rem' }}>✅ Migration Successful!</h3>
+              <p style={{ fontSize: '0.9rem', color: '#666' }}>
+                Database is now ready for imports. Movies: {migrateResults.stats?.movies || 0}, 
+                Recommendations: {migrateResults.stats?.recommendations || 0}
+              </p>
+            </div>
+          )}
+          
+          {migrateStatus === 'error' && (
+            <div style={{
+              backgroundColor: '#ffe6e6',
+              border: '1px solid #f44336',
+              borderRadius: '4px',
+              padding: '1rem'
+            }}>
+              <h3 style={{ color: '#c62828', marginBottom: '0.5rem' }}>❌ Migration Failed</h3>
+              <p style={{ fontSize: '0.9rem', color: '#666' }}>
+                {migrateResults?.error || 'Unknown error occurred'}
+              </p>
+            </div>
+          )}
+        </div>
         
         {/* Import Section */}
         <div style={{
