@@ -11,6 +11,7 @@ export default function AdminPage() {
       successful: number;
       failed: number;
     };
+    errors?: string[];
     error?: string;
   } | null>(null)
 
@@ -104,17 +105,43 @@ export default function AdminPage() {
           {/* Results */}
           {importStatus === 'success' && importResults?.results && (
             <div style={{
-              backgroundColor: '#e8f5e8',
-              border: '1px solid #4caf50',
+              backgroundColor: importResults.results.successful > 0 ? '#e8f5e8' : '#ffe6e6',
+              border: `1px solid ${importResults.results.successful > 0 ? '#4caf50' : '#f44336'}`,
               borderRadius: '4px',
               padding: '1rem'
             }}>
-              <h3 style={{ color: '#2e7d32', marginBottom: '0.5rem' }}>✅ Import Successful!</h3>
+              <h3 style={{ 
+                color: importResults.results.successful > 0 ? '#2e7d32' : '#c62828', 
+                marginBottom: '0.5rem' 
+              }}>
+                {importResults.results.successful > 0 ? '✅ Import Successful!' : '⚠️ Import Issues'}
+              </h3>
               <div style={{ fontSize: '0.9rem', color: '#666' }}>
                 <p>Processed: {importResults.results.processed}</p>
                 <p>Successful: {importResults.results.successful}</p>
                 <p>Failed: {importResults.results.failed}</p>
               </div>
+              
+              {/* Show errors if any failed */}
+              {importResults.results.failed > 0 && importResults.errors && (
+                <div style={{ marginTop: '1rem' }}>
+                  <h4 style={{ color: '#c62828', marginBottom: '0.5rem' }}>Sample Errors:</h4>
+                  <div style={{
+                    backgroundColor: '#f5f5f5',
+                    padding: '0.5rem',
+                    borderRadius: '4px',
+                    fontSize: '0.8rem',
+                    maxHeight: '200px',
+                    overflowY: 'auto'
+                  }}>
+                    {importResults.errors.map((error, index) => (
+                      <div key={index} style={{ marginBottom: '0.25rem' }}>
+                        {error}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
           

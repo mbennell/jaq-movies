@@ -44,9 +44,23 @@ async function searchTMDB(title: string, type: 'MOVIE' | 'SERIES') {
 
 export async function POST() {
   try {
+    console.log('Starting import process...');
+    
     // Load the parsed collection
     const jaqCollectionPath = path.join(process.cwd(), 'scripts', 'jaq-collection.json');
+    console.log('Looking for collection at:', jaqCollectionPath);
+    
+    if (!fs.existsSync(jaqCollectionPath)) {
+      throw new Error(`Collection file not found at ${jaqCollectionPath}`);
+    }
+    
     const jaqCollection: JaqMovie[] = JSON.parse(fs.readFileSync(jaqCollectionPath, 'utf-8'));
+    console.log(`Loaded ${jaqCollection.length} movies from collection`);
+    
+    // Check TMDB API key
+    if (!TMDB_API_KEY) {
+      console.warn('TMDB API key not found, will create movies without metadata');
+    }
     
     const results = {
       processed: 0,
@@ -57,10 +71,15 @@ export async function POST() {
 
     for (const item of jaqCollection) {
       results.processed++;
+      console.log(`Processing ${results.processed}/${jaqCollection.length}: ${item.title}`);
       
       try {
         // Search TMDB for the movie/series
-        const tmdbData = await searchTMDB(item.title, item.type);
+        let tmdbData = null;
+        if (TMDB_API_KEY) {
+          tmdbData = await searchTMDB(item.title, item.type);
+          console.log(`TMDB lookup for "${item.title}":`, tmdbData ? 'Found' : 'Not found');
+        }
         
         let movieData;
         if (tmdbData) {
@@ -77,7 +96,7 @@ export async function POST() {
               backdropPath: tmdbData.backdrop_path,
               rating: tmdbData.vote_average,
               genres: tmdbData.genre_ids?.map((id: number) => id.toString()) || [],
-              type: item.type,
+              type: item.type === 'SERIES' ? 'TV_SHOW' : item.type,
             }
           });
         } else {
@@ -86,10 +105,12 @@ export async function POST() {
             data: {
               title: item.title,
               originalTitle: item.title,
-              type: item.type,
+              type: item.type === 'SERIES' ? 'TV_SHOW' : item.type,
             }
           });
         }
+
+        console.log(`Created movie: ${movieData.id}`);
 
         // Create recommendation
         await prisma.recommendation.create({
@@ -106,19 +127,26 @@ export async function POST() {
         console.log(`✅ Imported: ${item.title}`);
         
         // Add small delay to be nice to TMDB API
-        await new Promise(resolve => setTimeout(resolve, 250));
+        if (TMDB_API_KEY) {
+          await new Promise(resolve => setTimeout(resolve, 250));
+        }
         
       } catch (error) {
         results.failed++;
-        const errorMsg = `Failed to import "${item.title}": ${error}`;
+        const errorMsg = `Failed to import "${item.title}": ${error instanceof Error ? error.message : String(error)}`;
         results.errors.push(errorMsg);
-        console.error(errorMsg);
+        console.error(`❌ ${errorMsg}`);
+        console.error('Full error:', error);
       }
     }
 
+    console.log('Import completed:', results);
+    
     return NextResponse.json({
       message: 'Import completed',
-      results
+      results,
+      // Include errors in response for debugging
+      errors: results.errors.slice(0, 5) // Show first 5 errors
     });
 
   } catch (error) {
