@@ -85,7 +85,7 @@ export default function UserPrompt() {
           color: 'var(--text-dark)',
           marginBottom: 'var(--spacing-lg)'
         }}>
-          Welcome to Jaq's Movie Guide! 🎬
+          Welcome to Jaq&apos;s Movie Guide! 🎬
         </h2>
         
         <p style={{
@@ -128,7 +128,7 @@ export default function UserPrompt() {
             }}
             disabled={!name.trim()}
           >
-            Let's Get Started! 🚀
+            Let&apos;s Get Started! 🚀
           </button>
         </form>
 

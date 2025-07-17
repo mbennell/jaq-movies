@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import Image from 'next/image'
 import { useUser } from '../contexts/UserContext'
 
@@ -99,9 +99,9 @@ export default function MovieDetailsModal({ movie, isOpen, onClose, onSelectMovi
       setIsWatchlisted(false)
       setIsWatched(false)
     }
-  }, [isOpen, movie, userId])
+  }, [isOpen, movie, userId, loadUserActions])
 
-  const loadUserActions = async () => {
+  const loadUserActions = useCallback(async () => {
     if (!movie || !userId) return
 
     try {
@@ -120,7 +120,7 @@ export default function MovieDetailsModal({ movie, isOpen, onClose, onSelectMovi
     } finally {
       setUserActionsLoading(false)
     }
-  }
+  }, [movie, userId])
 
   const saveUserActions = async () => {
     if (!movie || !userId) return
