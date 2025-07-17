@@ -893,6 +893,9 @@ p {
 
 .similar-movie-info {
   padding: var(--spacing-sm);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .similar-movie-info h4 {
@@ -913,6 +916,45 @@ p {
   align-items: center;
   font-size: var(--font-size-xs);
   color: var(--text-muted);
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Add to Collection Button */
+.add-to-collection-btn {
+  width: 100%;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-hover) 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 102, 255, 0.3);
+  margin-top: auto;
+}
+
+.add-to-collection-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 102, 255, 0.4);
+}
+
+.add-to-collection-btn.adding {
+  background: linear-gradient(135deg, var(--warning) 0%, #f59e0b 100%);
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+  cursor: not-allowed;
+}
+
+.add-to-collection-btn.added {
+  background: linear-gradient(135deg, var(--success) 0%, #10b981 100%);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  cursor: default;
+}
+
+.add-to-collection-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.8;
 }
 
 /* Trailer Modal */

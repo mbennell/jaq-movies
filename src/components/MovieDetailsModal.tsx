@@ -61,6 +61,8 @@ export default function MovieDetailsModal({ movie, isOpen, onClose, onSelectMovi
   const [personalRating, setPersonalRating] = useState<number>(0)
   const [isWatchlisted, setIsWatchlisted] = useState<boolean>(false)
   const [isWatched, setIsWatched] = useState<boolean>(false)
+  const [addingMovies, setAddingMovies] = useState<Set<number>>(new Set())
+  const [addedMovies, setAddedMovies] = useState<Set<number>>(new Set())
   // Handle escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -100,6 +102,44 @@ export default function MovieDetailsModal({ movie, isOpen, onClose, onSelectMovi
     if (level >= 4) return '⭐⭐⭐'
     if (level >= 3) return '⭐⭐'
     return '⭐'
+  }
+
+  const handleAddToCollection = async (tmdbId: number, title: string) => {
+    try {
+      // Add to loading state
+      setAddingMovies(prev => new Set(prev).add(tmdbId))
+
+      const response = await fetch('/api/movies/add-from-tmdb', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ tmdbId }),
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        // Add to success state
+        setAddedMovies(prev => new Set(prev).add(tmdbId))
+        console.log(`Successfully added "${title}" to collection`)
+      } else if (data.alreadyExists) {
+        // Already in collection
+        setAddedMovies(prev => new Set(prev).add(tmdbId))
+        console.log(`"${title}" is already in collection`)
+      } else {
+        console.error('Failed to add movie:', data.message)
+      }
+    } catch (error) {
+      console.error('Error adding movie to collection:', error)
+    } finally {
+      // Remove from loading state
+      setAddingMovies(prev => {
+        const newSet = new Set(prev)
+        newSet.delete(tmdbId)
+        return newSet
+      })
+    }
   }
 
   return (
@@ -342,23 +382,6 @@ export default function MovieDetailsModal({ movie, isOpen, onClose, onSelectMovi
             </div>
           )}
 
-          {/* Debug Info - Remove this later */}
-          <div style={{ 
-            background: '#222', 
-            padding: '10px', 
-            borderRadius: '5px', 
-            marginBottom: '20px',
-            fontSize: '12px',
-            color: '#ccc'
-          }}>
-            <strong>Debug Info:</strong><br/>
-            Trailers: {movie.trailers?.length || 0}<br/>
-            Similar Movies: {movie.similar_movies?.length || 0}<br/>
-            Movie ID: {movie.id}<br/>
-            {movie.trailers && movie.trailers.length > 0 && (
-              <div>First trailer: {movie.trailers[0].name}</div>
-            )}
-          </div>
 
           {/* Trailers */}
           {movie.trailers && movie.trailers.length > 0 && (
@@ -414,6 +437,23 @@ export default function MovieDetailsModal({ movie, isOpen, onClose, onSelectMovi
                         <span>⭐ {similarMovie.vote_average.toFixed(1)}</span>
                         <span>{new Date(similarMovie.release_date).getFullYear()}</span>
                       </div>
+                      <button
+                        className={`add-to-collection-btn ${
+                          addedMovies.has(similarMovie.id) ? 'added' : 
+                          addingMovies.has(similarMovie.id) ? 'adding' : ''
+                        }`}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          if (!addedMovies.has(similarMovie.id) && !addingMovies.has(similarMovie.id)) {
+                            handleAddToCollection(similarMovie.id, similarMovie.title)
+                          }
+                        }}
+                        disabled={addingMovies.has(similarMovie.id) || addedMovies.has(similarMovie.id)}
+                      >
+                        {addedMovies.has(similarMovie.id) ? '✅ Added' :
+                         addingMovies.has(similarMovie.id) ? '⏳ Adding...' :
+                         '➕ Add to Collection'}
+                      </button>
                     </div>
                   </div>
                 ))}
