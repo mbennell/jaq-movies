@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useEffect, useState } from 'react'
 
 interface NavigationProps {
@@ -48,13 +49,20 @@ export default function Navigation({ isTransparent = false }: NavigationProps) {
         <Link 
           href="/" 
           style={{ 
-            fontSize: 'var(--font-size-xl)', 
-            fontWeight: '600', 
-            textDecoration: 'none', 
-            color: 'var(--text-primary)'
+            textDecoration: 'none',
+            display: 'flex',
+            alignItems: 'center'
           }}
         >
-          🎬 Jaq&apos;s Movie Guide
+          <Image
+            src="/images/logo2.png"
+            alt="Jaq Deep Cuts"
+            width={120}
+            height={40}
+            style={{
+              objectFit: 'contain'
+            }}
+          />
         </Link>
         
         <div style={{ display: 'flex', gap: 'var(--spacing-lg)' }}>
