@@ -37,22 +37,8 @@ export default function Hero({ backgroundImage = '/images/jaq-movie-hero1.png' }
           textAlign: 'center',
           maxWidth: '600px'
         }}>
-          Chat with Jaq to get tailored movie picks
+          Where the Goode Weird Lives
         </p>
-        
-        <Link 
-          href="/simple-chat" 
-          className="btn btn-primary"
-          style={{
-            fontSize: 'var(--font-size-lg)',
-            padding: 'var(--spacing-lg) var(--spacing-2xl)',
-            fontWeight: '600',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px'
-          }}
-        >
-          Start Chatting
-        </Link>
       </div>
     </section>
   )

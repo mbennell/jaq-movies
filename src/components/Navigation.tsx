@@ -57,8 +57,8 @@ export default function Navigation({ isTransparent = false }: NavigationProps) {
           <Image
             src="/images/logo2.png"
             alt="Jaq Deep Cuts"
-            width={120}
-            height={40}
+            width={420}
+            height={140}
             style={{
               objectFit: 'contain'
             }}
