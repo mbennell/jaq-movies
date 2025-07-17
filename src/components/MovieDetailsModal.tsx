@@ -53,9 +53,10 @@ interface MovieDetailsModalProps {
   isOpen: boolean
   onClose: () => void
   onSelectMovie?: (movieId: number) => void
+  onMovieAdded?: () => void
 }
 
-export default function MovieDetailsModal({ movie, isOpen, onClose, onSelectMovie }: MovieDetailsModalProps) {
+export default function MovieDetailsModal({ movie, isOpen, onClose, onSelectMovie, onMovieAdded }: MovieDetailsModalProps) {
   const [showTrailer, setShowTrailer] = useState(false)
   const [selectedTrailer, setSelectedTrailer] = useState<Trailer | null>(null)
   const [personalRating, setPersonalRating] = useState<number>(0)
@@ -123,6 +124,8 @@ export default function MovieDetailsModal({ movie, isOpen, onClose, onSelectMovi
         // Add to success state
         setAddedMovies(prev => new Set(prev).add(tmdbId))
         console.log(`Successfully added "${title}" to collection`)
+        // Notify parent component to refresh movie list
+        onMovieAdded?.()
       } else if (data.alreadyExists) {
         // Already in collection
         setAddedMovies(prev => new Set(prev).add(tmdbId))

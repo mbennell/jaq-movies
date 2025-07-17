@@ -127,6 +127,11 @@ function MoviesContent() {
     await handleViewDetails(movieId)
   }
 
+  const handleMovieAdded = () => {
+    // Refresh the movies list when a new movie is added
+    loadMovies()
+  }
+
   return (
     <div>
       <Navigation isTransparent={true} />
@@ -175,11 +180,32 @@ function MoviesContent() {
             </div>
           )}
 
-          <SearchBar 
-            onSearch={handleSearch}
-            value={searchQuery}
-            onChange={setSearchQuery}
-          />
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 'var(--spacing-lg)',
+            marginBottom: 'var(--spacing-xl)',
+            flexWrap: 'wrap'
+          }}>
+            <SearchBar 
+              onSearch={handleSearch}
+              value={searchQuery}
+              onChange={setSearchQuery}
+            />
+            <button 
+              onClick={loadMovies}
+              className="btn btn-primary"
+              style={{
+                padding: 'var(--spacing-sm) var(--spacing-lg)',
+                fontSize: 'var(--font-size-sm)',
+                whiteSpace: 'nowrap'
+              }}
+              disabled={loading}
+            >
+              {loading ? '🔄 Refreshing...' : '🔄 Refresh'}
+            </button>
+          </div>
 
           {loading && (
             <div style={{ 
@@ -303,6 +329,7 @@ function MoviesContent() {
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         onSelectMovie={handleSelectSimilarMovie}
+        onMovieAdded={handleMovieAdded}
       />
       
       {/* Loading overlay for modal */}
