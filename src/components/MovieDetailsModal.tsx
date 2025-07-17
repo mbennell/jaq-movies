@@ -355,7 +355,7 @@ export default function MovieDetailsModal({ movie, isOpen, onClose, onSelectMovi
             Trailers: {movie.trailers?.length || 0}<br/>
             Similar Movies: {movie.similar_movies?.length || 0}<br/>
             Movie ID: {movie.id}<br/>
-            {movie.trailers?.length > 0 && (
+            {movie.trailers && movie.trailers.length > 0 && (
               <div>First trailer: {movie.trailers[0].name}</div>
             )}
           </div>
