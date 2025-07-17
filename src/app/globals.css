@@ -872,6 +872,9 @@ p {
   cursor: pointer;
   transition: all var(--transition-normal);
   box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  min-height: 380px;
 }
 
 .similar-movie-card:hover {
@@ -895,7 +898,9 @@ p {
   padding: var(--spacing-sm);
   display: flex;
   flex-direction: column;
-  height: 100%;
+  flex: 1;
+  min-height: 150px;
+  background: var(--bg-secondary);
 }
 
 .similar-movie-info h4 {
@@ -933,6 +938,12 @@ p {
   color: white;
   box-shadow: 0 2px 8px rgba(0, 102, 255, 0.3);
   margin-top: auto;
+  position: relative;
+  z-index: 5;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .add-to-collection-btn:hover:not(:disabled) {
