@@ -50,7 +50,30 @@ export async function GET(
       })
     }
 
-    const tmdbId = movie.tmdbId || movie.id
+    const tmdbId = movie.tmdbId
+    
+    if (!tmdbId) {
+      console.error(`Movie "${movie.title}" has no TMDB ID. Internal ID: ${movie.id}`)
+      // Return basic movie data without TMDB enhancements
+      return NextResponse.json({
+        success: true,
+        movie: {
+          id: movie.id,
+          title: movie.title,
+          overview: movie.overview || 'No overview available',
+          release_date: movie.releaseDate?.toISOString().split('T')[0] || '',
+          poster_path: movie.posterPath || '',
+          vote_average: movie.rating || 0,
+          jaqNotes: movie.recommendations.find(r => r.recommendedBy === 'jaq')?.jaqNotes || null,
+          enthusiasmLevel: movie.recommendations.find(r => r.recommendedBy === 'jaq')?.enthusiasmLevel || 3,
+          cast: [],
+          trailers: [],
+          similar_movies: []
+        }
+      })
+    }
+
+    console.log(`Fetching TMDB data for "${movie.title}" with TMDB ID: ${tmdbId}`)
 
     // Create headers for TMDB API (supports both API key and Bearer token)
     const tmdbHeaders = {
@@ -76,11 +99,17 @@ export async function GET(
     // Parse TMDB movie details
     if (movieDetails.status === 'fulfilled' && movieDetails.value.ok) {
       tmdbMovie = await movieDetails.value.json()
+      console.log(`TMDB Movie data: ${tmdbMovie.title} (${tmdbMovie.release_date})`)
+    } else {
+      console.error('Failed to fetch TMDB movie details:', movieDetails.status === 'fulfilled' ? movieDetails.value.status : movieDetails.reason)
     }
 
     // Parse TMDB credits
     if (credits.status === 'fulfilled' && credits.value.ok) {
       tmdbCredits = await credits.value.json()
+      console.log(`TMDB Credits: ${tmdbCredits.cast?.length || 0} cast members for "${tmdbMovie?.title || 'Unknown'}"`)
+    } else {
+      console.error('Failed to fetch TMDB credits:', credits.status === 'fulfilled' ? credits.value.status : credits.reason)
     }
 
     // Parse TMDB watch providers
@@ -99,6 +128,9 @@ export async function GET(
     // Parse TMDB recommendations
     if (recommendations.status === 'fulfilled' && recommendations.value.ok) {
       tmdbRecommendations = await recommendations.value.json()
+      console.log(`TMDB Recommendations: ${tmdbRecommendations.results?.length || 0} similar movies for "${tmdbMovie?.title || 'Unknown'}"`)
+    } else {
+      console.error('Failed to fetch TMDB recommendations:', recommendations.status === 'fulfilled' ? recommendations.value.status : recommendations.reason)
     }
 
     // Combine our database data with TMDB data

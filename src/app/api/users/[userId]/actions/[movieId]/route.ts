@@ -10,15 +10,42 @@ export async function GET(
   try {
     const { userId, movieId } = await params
     
-    // Find user action for this user and movie
+    console.log(`Fetching user action for userId: "${userId}", movieId: "${movieId}"`)
+    
+    // First check if the movie exists to get the correct internal ID
+    const movie = await prisma.movie.findFirst({
+      where: {
+        OR: [
+          { id: movieId },
+          { tmdbId: parseInt(movieId) }
+        ]
+      }
+    })
+
+    if (!movie) {
+      console.log(`Movie not found for ID: ${movieId}`)
+      return NextResponse.json({
+        success: true,
+        userAction: {
+          rating: null,
+          isWatchlisted: false,
+          isWatched: false,
+          personalNotes: null
+        }
+      })
+    }
+
+    // Find user action using the internal movie ID
     const userAction = await prisma.userAction.findUnique({
       where: {
         userId_movieId: {
           userId: userId,
-          movieId: movieId
+          movieId: movie.id
         }
       }
     })
+
+    console.log(`User action found:`, userAction ? 'Yes' : 'No')
 
     return NextResponse.json({
       success: true,

@@ -25,7 +25,7 @@ export default function UserPrompt() {
     return (
       <div style={{
         position: 'fixed',
-        top: 'var(--spacing-lg)',
+        top: 'calc(70px + var(--spacing-sm))', // Account for navigation height
         right: 'var(--spacing-lg)',
         zIndex: 1500,
         background: 'var(--bg-secondary)',
