@@ -226,6 +226,30 @@ p {
   box-shadow: var(--shadow-sm);
 }
 
+/* Logo responsive sizing */
+.nav-logo {
+  max-width: 300px;
+  height: auto;
+  object-fit: contain;
+}
+
+@media (max-width: 768px) {
+  .nav-logo {
+    max-width: 200px;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-logo {
+    max-width: 150px;
+  }
+  
+  /* Hide some navigation items on mobile to prevent overflow */
+  .nav-item-admin {
+    display: none;
+  }
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;

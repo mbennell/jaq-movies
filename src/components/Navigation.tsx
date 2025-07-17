@@ -55,13 +55,11 @@ export default function Navigation({ isTransparent = false }: NavigationProps) {
           }}
         >
           <Image
-            src="/images/logo2.png"
-            alt="Jaq Deep Cuts"
+            src="/images/jaq-logo-glitch.png"
+            alt="Jaq Movie Logo"
             width={420}
             height={140}
-            style={{
-              objectFit: 'contain'
-            }}
+            className="nav-logo"
           />
         </Link>
         
@@ -114,6 +112,7 @@ export default function Navigation({ isTransparent = false }: NavigationProps) {
           
           <Link 
             href="/admin" 
+            className="nav-item-admin"
             style={{ 
               textDecoration: 'none', 
               color: 'var(--text-muted)',
