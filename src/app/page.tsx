@@ -7,7 +7,6 @@ import SearchBar from '../components/SearchBar'
 import MovieCard from '../components/MovieCard'
 import FadeInSection from '../components/FadeInSection'
 import MovieDetailsModal from '../components/MovieDetailsModal'
-import UserPrompt from '../components/UserPrompt'
 
 interface Movie {
   id: string | number
@@ -254,8 +253,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* User Identification */}
-      <UserPrompt />
     </div>
   )
 }

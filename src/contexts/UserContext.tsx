@@ -14,10 +14,15 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const [userId, setUserIdState] = useState<string | null>(null)
 
   useEffect(() => {
-    // Load user from localStorage on mount
+    // Load user from localStorage on mount, or set default for proof of concept
     const storedUserId = localStorage.getItem('jaq-movie-user')
     if (storedUserId) {
       setUserIdState(storedUserId)
+    } else {
+      // Set default user for proof of concept (until OAuth login is implemented)
+      const defaultUser = 'Demo User'
+      setUserIdState(defaultUser)
+      localStorage.setItem('jaq-movie-user', defaultUser)
     }
   }, [])
 

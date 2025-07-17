@@ -24,7 +24,7 @@ export default function Hero({ backgroundImage = '/images/jaq-movie-hero1.png' }
           color: 'var(--text-primary)',
           textAlign: 'center'
         }}>
-          Find Your Next<br />Favourite Film
+          Jaq&apos;s Gonna Find<br />Your Next Movie
         </h1>
         
         <p style={{ 
