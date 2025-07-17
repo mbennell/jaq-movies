@@ -52,13 +52,19 @@ export async function GET(
 
     const tmdbId = movie.tmdbId || movie.id
 
+    // Create headers for TMDB API (supports both API key and Bearer token)
+    const tmdbHeaders = {
+      'Authorization': `Bearer ${tmdbApiKey}`,
+      'Content-Type': 'application/json'
+    }
+
     // Fetch detailed movie data from TMDB
     const [movieDetails, credits, watchProviders, videos, recommendations] = await Promise.allSettled([
-      fetch(`https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${tmdbApiKey}`),
-      fetch(`https://api.themoviedb.org/3/movie/${tmdbId}/credits?api_key=${tmdbApiKey}`),
-      fetch(`https://api.themoviedb.org/3/movie/${tmdbId}/watch/providers?api_key=${tmdbApiKey}`),
-      fetch(`https://api.themoviedb.org/3/movie/${tmdbId}/videos?api_key=${tmdbApiKey}`),
-      fetch(`https://api.themoviedb.org/3/movie/${tmdbId}/recommendations?api_key=${tmdbApiKey}`)
+      fetch(`https://api.themoviedb.org/3/movie/${tmdbId}`, { headers: tmdbHeaders }),
+      fetch(`https://api.themoviedb.org/3/movie/${tmdbId}/credits`, { headers: tmdbHeaders }),
+      fetch(`https://api.themoviedb.org/3/movie/${tmdbId}/watch/providers`, { headers: tmdbHeaders }),
+      fetch(`https://api.themoviedb.org/3/movie/${tmdbId}/videos`, { headers: tmdbHeaders }),
+      fetch(`https://api.themoviedb.org/3/movie/${tmdbId}/recommendations`, { headers: tmdbHeaders })
     ])
 
     let tmdbMovie = null
@@ -85,6 +91,9 @@ export async function GET(
     // Parse TMDB videos (trailers)
     if (videos.status === 'fulfilled' && videos.value.ok) {
       tmdbVideos = await videos.value.json()
+      console.log('TMDB Videos response:', tmdbVideos)
+    } else {
+      console.error('Failed to fetch TMDB videos:', videos.status === 'fulfilled' ? videos.value.status : videos.reason)
     }
 
     // Parse TMDB recommendations
@@ -115,6 +124,9 @@ export async function GET(
       ).slice(0, 3) || [],
       similar_movies: tmdbRecommendations?.results?.slice(0, 8) || []
     }
+
+    console.log('Enhanced movie trailers count:', enhancedMovie.trailers?.length || 0)
+    console.log('Enhanced movie similar movies count:', enhancedMovie.similar_movies?.length || 0)
 
     return NextResponse.json({
       success: true,

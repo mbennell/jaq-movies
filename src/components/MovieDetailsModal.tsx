@@ -342,6 +342,24 @@ export default function MovieDetailsModal({ movie, isOpen, onClose, onSelectMovi
             </div>
           )}
 
+          {/* Debug Info - Remove this later */}
+          <div style={{ 
+            background: '#222', 
+            padding: '10px', 
+            borderRadius: '5px', 
+            marginBottom: '20px',
+            fontSize: '12px',
+            color: '#ccc'
+          }}>
+            <strong>Debug Info:</strong><br/>
+            Trailers: {movie.trailers?.length || 0}<br/>
+            Similar Movies: {movie.similar_movies?.length || 0}<br/>
+            Movie ID: {movie.id}<br/>
+            {movie.trailers?.length > 0 && (
+              <div>First trailer: {movie.trailers[0].name}</div>
+            )}
+          </div>
+
           {/* Trailers */}
           {movie.trailers && movie.trailers.length > 0 && (
             <div className="trailers-section">
