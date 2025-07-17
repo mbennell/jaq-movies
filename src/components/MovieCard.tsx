@@ -52,7 +52,8 @@ export default function MovieCard({ movie, onViewDetails }: MovieCardProps) {
         display: 'flex',
         flexDirection: 'column',
         position: 'relative',
-        cursor: 'pointer'
+        cursor: 'pointer',
+        border: '3px solid red' // Temporary debug border
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
