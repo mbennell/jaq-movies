@@ -15,8 +15,7 @@ export default function Hero({ backgroundImage = '/images/jaq-movie-hero1.png' }
     >
       <div className="hero-overlay"></div>
       <div className="hero-content">
-        <h1 style={{ 
-          fontSize: 'var(--font-size-6xl)',
+        <h1 className="hero-title" style={{ 
           fontWeight: '700',
           textTransform: 'uppercase',
           letterSpacing: '-0.02em',
@@ -27,8 +26,7 @@ export default function Hero({ backgroundImage = '/images/jaq-movie-hero1.png' }
           Jaq&apos;s Gonna Find<br />Your Next Movie
         </h1>
         
-        <p style={{ 
-          fontSize: 'var(--font-size-xl)',
+        <p className="hero-tagline" style={{ 
           fontWeight: '400',
           marginBottom: 'var(--spacing-2xl)',
           color: 'var(--text-secondary)',
