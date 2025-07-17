@@ -5,6 +5,10 @@
 /* 🎬 Jaq's Movie Guide - Modern Cinematic Design System */
 
 :root {
+  /* Header Height System */
+  --header-height: 60px;
+  --header-height-desktop: 80px;
+  
   /* Modern Dark Palette */
   --bg-primary: #111111;
   --bg-secondary: #1a1a1a;
@@ -132,7 +136,7 @@ p {
 }
 
 .hero-section {
-  height: 100vh;
+  min-height: calc(100vh - var(--header-height));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -140,6 +144,7 @@ p {
   background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
   position: relative;
   overflow: hidden;
+  padding-top: var(--header-height);
 }
 
 .hero-overlay {
@@ -369,13 +374,41 @@ p {
   background: var(--bg-secondary);
 }
 
-@media (max-width: 768px) {
+/* Desktop header height */
+@media (min-width: 1024px) {
+  :root {
+    --header-height: var(--header-height-desktop);
+  }
+}
+
+/* Desktop Navigation */
+@media (min-width: 769px) {
   .desktop-nav {
-    display: none;
+    display: flex !important;
+    height: var(--header-height);
+    align-items: center;
   }
   
   .mobile-header {
-    display: flex;
+    display: none !important;
+  }
+  
+  .mobile-menu {
+    display: none !important;
+  }
+  
+  .nav-logo {
+    max-width: 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  .desktop-nav {
+    display: none !important;
+  }
+  
+  .mobile-header {
+    display: flex !important;
   }
   
   .nav-logo {
@@ -396,28 +429,41 @@ p {
 
 /* Responsive Hero Typography */
 .hero-title {
-  font-size: clamp(2.5rem, 8vw, 5rem);
+  font-size: clamp(2.5rem, 8vw, 4.5rem);
   line-height: 1.1;
   margin-top: 2rem;
+  max-width: 20ch;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .hero-tagline {
-  font-size: clamp(1rem, 3.5vw, 1.5rem);
+  font-size: clamp(1rem, 3.5vw, 1.75rem);
+  max-width: 30ch;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* Hero section mobile adjustments */
 @media (max-width: 768px) {
   .hero-section {
-    min-height: 70vh;
+    min-height: calc(100vh - var(--header-height));
   }
   
   .hero-content {
-    padding-top: calc(env(safe-area-inset-top) + 60px);
+    padding-top: calc(env(safe-area-inset-top) + var(--header-height));
   }
 }
 
 @media (max-width: 480px) {
   .hero-tagline--duplicate {
+    display: none;
+  }
+}
+
+/* Hide tagline on desktop if logo includes it */
+@media (min-width: 1024px) {
+  .hero-tagline--hide-desktop {
     display: none;
   }
 }

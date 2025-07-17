@@ -46,6 +46,7 @@ export default function Navigation({ isTransparent = false }: NavigationProps) {
           left: 0,
           right: 0,
           zIndex: 1000,
+          height: 'var(--header-height)',
           padding: 'var(--spacing-lg)',
           transition: 'all var(--transition-normal)',
           borderBottom: !isTransparent || isScrolled ? '1px solid var(--bg-secondary)' : 'none'

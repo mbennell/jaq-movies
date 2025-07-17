@@ -6,6 +6,7 @@ interface HeroProps {
   showCTA?: boolean
   ctaText?: string
   ctaLink?: string
+  hideTaglineOnDesktop?: boolean
 }
 
 export default function Hero({ 
@@ -13,7 +14,8 @@ export default function Hero({
   children,
   showCTA = false,
   ctaText = 'Chat with Jaq',
-  ctaLink = '/simple-chat'
+  ctaLink = '/simple-chat',
+  hideTaglineOnDesktop = false
 }: HeroProps) {
   return (
     <section 
@@ -38,7 +40,7 @@ export default function Hero({
           Jaq&apos;s Gonna Find<br />Your Next Movie
         </h1>
         
-        <p className="hero-tagline" style={{ 
+        <p className={`hero-tagline ${hideTaglineOnDesktop ? 'hero-tagline--hide-desktop' : ''}`} style={{ 
           fontWeight: '400',
           marginBottom: 'var(--spacing-2xl)',
           color: 'var(--text-secondary)',

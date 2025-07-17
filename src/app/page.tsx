@@ -125,6 +125,7 @@ export default function Home() {
         showCTA={true}
         ctaText="Chat with Jaq"
         ctaLink="/simple-chat"
+        hideTaglineOnDesktop={true}
       />
       
       <FadeInSection delay={200}>
