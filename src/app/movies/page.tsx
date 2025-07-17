@@ -5,7 +5,6 @@ import { useSearchParams } from 'next/navigation'
 import Navigation from '../../components/Navigation'
 import SearchBar from '../../components/SearchBar'
 import MovieCard from '../../components/MovieCard'
-import FadeInSection from '../../components/FadeInSection'
 import Hero from '../../components/Hero'
 import ScrollIndicator from '../../components/ScrollIndicator'
 import MovieDetailsModal from '../../components/MovieDetailsModal'
@@ -340,7 +339,7 @@ function MoviesContent() {
           {/* Movies Grid */}
           {filteredMovies.length > 0 && (
             <div id="movies-grid" className="movie-grid">
-              {filteredMovies.map((movie, index) => (
+              {filteredMovies.map((movie) => (
                 <div key={movie.id} style={{ opacity: 1 }}>
                   <MovieCard movie={movie} onViewDetails={handleViewDetails} />
                 </div>
