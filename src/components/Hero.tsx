@@ -1,8 +1,20 @@
+import Link from 'next/link'
+
 interface HeroProps {
   backgroundImage?: string
+  children?: React.ReactNode
+  showCTA?: boolean
+  ctaText?: string
+  ctaLink?: string
 }
 
-export default function Hero({ backgroundImage = '/images/jaq-movie-hero1.png' }: HeroProps) {
+export default function Hero({ 
+  backgroundImage = '/images/jaq-movie-hero1.png',
+  children,
+  showCTA = false,
+  ctaText = 'Chat with Jaq',
+  ctaLink = '/simple-chat'
+}: HeroProps) {
   return (
     <section 
       className="hero-section hero-background"
@@ -35,6 +47,20 @@ export default function Hero({ backgroundImage = '/images/jaq-movie-hero1.png' }
         }}>
           Where the Goode Weird Lives
         </p>
+
+        {showCTA && (
+          <div className="hero-cta">
+            <Link href={ctaLink} className="cta-button">
+              {ctaText}
+            </Link>
+          </div>
+        )}
+
+        {children && (
+          <div className="hero-custom-content">
+            {children}
+          </div>
+        )}
       </div>
     </section>
   )

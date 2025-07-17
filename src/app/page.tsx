@@ -120,7 +120,12 @@ export default function Home() {
     <div>
       <Navigation isTransparent={true} />
       
-      <Hero backgroundImage="/images/jaq-founder.png" />
+      <Hero 
+        backgroundImage="/images/jaq-founder.png" 
+        showCTA={true}
+        ctaText="Chat with Jaq"
+        ctaLink="/simple-chat"
+      />
       
       <FadeInSection delay={200}>
         <SearchBar onSearch={handleSearch} />

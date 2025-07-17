@@ -12,7 +12,8 @@ interface NavigationProps {
 export default function Navigation({ isTransparent = false }: NavigationProps) {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const { userId } = useUser()
+  const [avatarError, setAvatarError] = useState(false)
+  const { userId, userAvatar } = useUser()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -150,7 +151,20 @@ export default function Navigation({ isTransparent = false }: NavigationProps) {
       <header className="mobile-header">
         <button className="nav-avatar" aria-label="User menu">
           <div className="avatar-circle">
-            {userId ? userId.charAt(0).toUpperCase() : 'U'}
+            {userAvatar && !avatarError ? (
+              <Image
+                src={userAvatar}
+                alt={userId || 'User'}
+                width={32}
+                height={32}
+                className="avatar-image"
+                onError={() => setAvatarError(true)}
+              />
+            ) : (
+              <span className="avatar-initials">
+                {userId ? userId.charAt(0).toUpperCase() : 'U'}
+              </span>
+            )}
           </div>
         </button>
         <Link href="/">
