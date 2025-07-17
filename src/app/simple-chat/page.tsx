@@ -29,14 +29,14 @@ export default function SimpleChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       type: 'ai',
-      content: "Hi! I'm here to help with movie recommendations. You can tell me what you just watched, or ask me what you should watch next! 🎬",
+      content: "Hi! I'm your movie discovery assistant. Ask me to find movies similar to your favorites, and I'll search through thousands of films to find perfect matches. I can also add great movies directly to your collection! 🎬",
       timestamp: new Date()
     }
   ])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [recommendations, setRecommendations] = useState<Recommendation[]>([])
-  const [isChatOpen, setIsChatOpen] = useState(false)
+  const [movieSuggestions, setMovieSuggestions] = useState<any[]>([])
 
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return
@@ -91,6 +91,11 @@ export default function SimpleChatPage() {
 
       setMessages(prev => [...prev, aiMessage])
 
+      // Handle movie suggestions from TMDB
+      if (data.movieSuggestions) {
+        setMovieSuggestions(data.movieSuggestions)
+      }
+
       if (data.suggestions) {
         setRecommendations(data.suggestions)
       }
@@ -108,6 +113,46 @@ export default function SimpleChatPage() {
     }
   }
 
+  const addMovieToCollection = async (tmdbId: number) => {
+    try {
+      const response = await fetch('/api/movies/add-from-tmdb', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ tmdbId }),
+      })
+      
+      const data = await response.json()
+      
+      if (data.success) {
+        const successMessage: ChatMessage = {
+          type: 'ai',
+          content: `Great! "${data.movie.title}" has been added to your collection! 🎉`,
+          timestamp: new Date()
+        }
+        setMessages(prev => [...prev, successMessage])
+      } else {
+        const errorMessage: ChatMessage = {
+          type: 'ai',
+          content: data.alreadyExists 
+            ? `"${data.movie?.title || 'This movie'}" is already in your collection!`
+            : `Sorry, I couldn't add that movie: ${data.message}`,
+          timestamp: new Date()
+        }
+        setMessages(prev => [...prev, errorMessage])
+      }
+    } catch (error) {
+      console.error('Error adding movie:', error)
+      const errorMessage: ChatMessage = {
+        type: 'ai',
+        content: "Sorry, I had trouble adding that movie to your collection. Please try again!",
+        timestamp: new Date()
+      }
+      setMessages(prev => [...prev, errorMessage])
+    }
+  }
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
@@ -117,186 +162,104 @@ export default function SimpleChatPage() {
 
   return (
     <div className="page-container">
-      <Navigation isTransparent={true} />
+      <Navigation isTransparent={false} />
       
-      <section className="hero-section-wrapper">
-        <Hero />
-      </section>
-      
-      <aside className="content-container" style={{ 
-        paddingTop: 'var(--spacing-4xl)',
-        paddingBottom: 'var(--spacing-2xl)',
-        position: 'relative'
-      }}>
+      <div className="chat-page-container">
         {/* Header */}
-        <div className="chat-header">
-          <h1 className="chat-title">
-            🤖 AI Movie Chat
+        <div className="chat-page-header">
+          <h1 className="chat-page-title">
+            🎬 Movie Discovery Chat
           </h1>
-          <p className="chat-subtitle">
-            Ask for recommendations or tell me what you watched!
+          <p className="chat-page-subtitle">
+            Ask me to find movies similar to your favorites, or discover something new!
           </p>
-          <button 
-            onClick={() => setIsChatOpen(!isChatOpen)}
-            className="btn btn-primary"
-            style={{ marginTop: 'var(--spacing-lg)' }}
-          >
-            {isChatOpen ? 'Close Chat' : 'Open Chat'}
-          </button>
+          <div className="chat-examples">
+            <span className="chat-example">Try: "Find something similar to Interstellar"</span>
+            <span className="chat-example">Or: "I want a sci-fi thriller like Arrival"</span>
+          </div>
         </div>
 
-        {/* Chat Modal */}
-        {isChatOpen && (
-          <div className="chat-modal">
-            <div className="chat-container">
-              {/* Messages */}
-              <div className="chat-messages">
-                {messages.map((message, index) => (
-                  <div key={index} className={`message ${message.type}`}>
-                    <div className={`message-bubble ${message.type}`}>
-                      <div className="message-content">
-                        {message.content}
-                      </div>
-                      <p className="message-time">
-                        {message.timestamp.toLocaleTimeString()}
-                      </p>
+        {/* Main Chat Interface */}
+        <div className="chat-interface">
+          <div className="chat-container">
+            {/* Messages */}
+            <div className="chat-messages">
+              {messages.map((message, index) => (
+                <div key={index} className={`message ${message.type}`}>
+                  <div className={`message-bubble ${message.type}`}>
+                    <div className="message-content">
+                      {message.content}
                     </div>
-                  </div>
-                ))}
-                {isLoading && (
-                  <div className="message ai">
-                    <div className="message-bubble ai">
-                      <span>Thinking...</span>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Input */}
-              <div className="chat-input-container">
-                <input
-                  type="text"
-                  placeholder="What's on your mind about movies?"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  disabled={isLoading}
-                  className="chat-input"
-                />
-                <button
-                  onClick={sendMessage}
-                  disabled={!input.trim() || isLoading}
-                  className="btn btn-primary"
-                  style={{
-                    padding: 'var(--spacing-md) var(--spacing-xl)',
-                    fontSize: 'var(--font-size-sm)',
-                    fontWeight: '600',
-                    opacity: (!input.trim() || isLoading) ? 0.5 : 1,
-                    cursor: (!input.trim() || isLoading) ? 'not-allowed' : 'pointer'
-                  }}
-                >
-                  Send
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Recommendations */}
-        {recommendations.length > 0 && (
-          <div style={{
-            backgroundColor: 'var(--bg-card)',
-            border: '1px solid var(--bg-secondary)',
-            borderRadius: 'var(--border-radius-lg)',
-            padding: 'var(--spacing-xl)',
-            boxShadow: 'var(--shadow-lg)'
-          }}>
-            <h3 style={{ 
-              margin: '0 0 var(--spacing-lg) 0', 
-              color: 'var(--text-dark)',
-              fontSize: 'var(--font-size-xl)',
-              fontWeight: '600'
-            }}>
-              Recent Recommendations
-            </h3>
-            <div style={{ display: 'grid', gap: 'var(--spacing-md)' }}>
-              {recommendations.map((rec) => (
-                <div
-                  key={rec.id}
-                  style={{
-                    padding: 'var(--spacing-lg)',
-                    border: '1px solid var(--bg-secondary)',
-                    borderRadius: 'var(--border-radius)',
-                    backgroundColor: 'var(--bg-primary)',
-                    transition: 'all var(--transition-normal)'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--bg-secondary)'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--bg-primary)'
-                  }}
-                >
-                  <h4 style={{ 
-                    margin: '0 0 var(--spacing-sm) 0', 
-                    color: 'var(--text-primary)',
-                    fontSize: 'var(--font-size-lg)',
-                    fontWeight: '600'
-                  }}>
-                    {rec.movie.title}
-                  </h4>
-                  {rec.jaqNotes && (
-                    <p style={{ 
-                      margin: '0 0 var(--spacing-sm) 0', 
-                      fontSize: 'var(--font-size-sm)', 
-                      color: 'var(--text-secondary)',
-                      fontStyle: 'italic'
-                    }}>
-                      &quot;{rec.jaqNotes}&quot;
+                    <p className="message-time">
+                      {message.timestamp.toLocaleTimeString()}
                     </p>
-                  )}
-                  <div style={{ display: 'flex', gap: 'var(--spacing-md)', alignItems: 'center' }}>
-                    <span style={{
-                      padding: 'var(--spacing-xs) var(--spacing-sm)',
-                      backgroundColor: rec.recommendedBy === 'jaq' ? 'var(--accent-primary)' : 'var(--bg-secondary)',
-                      color: rec.recommendedBy === 'jaq' ? 'white' : 'var(--text-primary)',
-                      borderRadius: 'var(--border-radius-full)',
-                      fontSize: 'var(--font-size-xs)',
-                      fontWeight: '600'
-                    }}>
-                      {rec.recommendedBy === 'jaq' ? '👑 Jaq' : rec.recommendedBy}
-                    </span>
-                    <span style={{ fontSize: 'var(--font-size-sm)' }}>
-                      {'⭐'.repeat(rec.enthusiasmLevel)}
-                    </span>
                   </div>
                 </div>
               ))}
+              {isLoading && (
+                <div className="message ai">
+                  <div className="message-bubble ai">
+                    <span>Searching for movies...</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Movie Suggestions */}
+            {movieSuggestions.length > 0 && (
+              <div className="movie-suggestions">
+                <h3>Movie Suggestions</h3>
+                <div className="suggestions-grid">
+                  {movieSuggestions.map((movie, index) => (
+                    <div key={index} className="movie-suggestion-card">
+                      {movie.poster_path && (
+                        <img 
+                          src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
+                          alt={movie.title}
+                          className="suggestion-poster"
+                        />
+                      )}
+                      <div className="suggestion-content">
+                        <h4>{movie.title}</h4>
+                        <p className="suggestion-overview">{movie.overview}</p>
+                        <div className="suggestion-actions">
+                          <button 
+                            className="btn btn-primary add-to-collection"
+                            onClick={() => addMovieToCollection(movie.id)}
+                          >
+                            Add to Collection
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Input */}
+            <div className="chat-input-container">
+              <input
+                type="text"
+                placeholder="Ask me to find movies similar to your favorites..."
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyPress={handleKeyPress}
+                disabled={isLoading}
+                className="chat-input"
+              />
+              <button
+                onClick={sendMessage}
+                disabled={!input.trim() || isLoading}
+                className="btn btn-primary chat-send-btn"
+              >
+                {isLoading ? 'Searching...' : 'Send'}
+              </button>
             </div>
           </div>
-        )}
-
-        {/* Admin Link */}
-        <div style={{ textAlign: 'center', marginTop: 'var(--spacing-xl)' }}>
-          <a 
-            href="/admin" 
-            style={{ 
-              color: 'var(--accent-primary)', 
-              textDecoration: 'none',
-              fontSize: 'var(--font-size-sm)',
-              transition: 'color var(--transition-fast)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = 'var(--accent-hover)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = 'var(--accent-primary)'
-            }}
-          >
-            Import Jaq&apos;s Collection (Admin)
-          </a>
         </div>
-      </aside>
+
+      </div>
     </div>
   )
 }

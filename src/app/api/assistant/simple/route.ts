@@ -7,6 +7,90 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 })
 
+async function searchSimilarMovies(userMessage: string): Promise<any[]> {
+  const tmdbApiKey = process.env.TMDB_API_KEY
+  if (!tmdbApiKey) {
+    return []
+  }
+
+  const tmdbHeaders = {
+    'Authorization': `Bearer ${tmdbApiKey}`,
+    'Content-Type': 'application/json'
+  }
+
+  try {
+    // Extract movie name from user message using simple patterns
+    let movieName = ''
+    
+    // Look for patterns like "similar to X" or "like X"
+    const similarMatch = userMessage.match(/similar to\s+([^,.!?]+)/i)
+    const likeMatch = userMessage.match(/like\s+([^,.!?]+)/i)
+    
+    if (similarMatch) {
+      movieName = similarMatch[1].trim()
+    } else if (likeMatch) {
+      movieName = likeMatch[1].trim()
+    } else {
+      // Fallback: just search for popular movies in relevant genres
+      const response = await fetch(
+        `https://api.themoviedb.org/3/movie/popular?page=1`,
+        { headers: tmdbHeaders }
+      )
+      
+      if (response.ok) {
+        const data = await response.json()
+        return data.results.slice(0, 6) // Return 6 popular movies
+      }
+      return []
+    }
+
+    console.log('Searching TMDB for movies similar to:', movieName)
+
+    // First, search for the movie they mentioned
+    const searchResponse = await fetch(
+      `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(movieName)}&page=1`,
+      { headers: tmdbHeaders }
+    )
+
+    if (!searchResponse.ok) {
+      console.error('TMDB search failed:', searchResponse.statusText)
+      return []
+    }
+
+    const searchData = await searchResponse.json()
+    
+    if (searchData.results.length === 0) {
+      console.log('No movies found for:', movieName)
+      return []
+    }
+
+    const targetMovie = searchData.results[0]
+    console.log('Found target movie:', targetMovie.title)
+
+    // Get similar movies using TMDB's similar endpoint
+    const similarResponse = await fetch(
+      `https://api.themoviedb.org/3/movie/${targetMovie.id}/similar?page=1`,
+      { headers: tmdbHeaders }
+    )
+
+    if (!similarResponse.ok) {
+      console.error('TMDB similar movies failed:', similarResponse.statusText)
+      return []
+    }
+
+    const similarData = await similarResponse.json()
+    
+    // Return top 6 similar movies with good ratings and descriptions
+    return similarData.results
+      .filter((movie: any) => movie.vote_average > 6.0 && movie.overview)
+      .slice(0, 6)
+
+  } catch (error) {
+    console.error('Error searching similar movies:', error)
+    return []
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { message } = await request.json()
@@ -72,22 +156,44 @@ export async function POST(request: NextRequest) {
       }, { status: 200 })
     }
     
+    // Check if user is asking for similar movies
+    const isSimilarMovieRequest = message.toLowerCase().includes('similar') || 
+                                  message.toLowerCase().includes('like') ||
+                                  message.toLowerCase().includes('find') ||
+                                  message.toLowerCase().includes('recommend')
+
+    let movieSuggestions = []
+    
+    // If requesting similar movies, search TMDB
+    if (isSimilarMovieRequest && process.env.TMDB_API_KEY) {
+      try {
+        movieSuggestions = await searchSimilarMovies(message)
+        console.log('Found', movieSuggestions.length, 'movie suggestions from TMDB')
+      } catch (tmdbError) {
+        console.warn('TMDB search failed:', tmdbError)
+      }
+    }
+
     // Simple OpenAI chat completion
     try {
       console.log('Making OpenAI request with', movieContext.length, 'movies in context')
       
-      const response = await openai.chat.completions.create({
-        model: 'gpt-4o-mini', // Use the faster, cheaper model
-        messages: [
-          {
-            role: 'system',
-            content: `You are a movie recommendation assistant for Jaq's curated collection. Here are the available movies:
+      const systemPrompt = movieSuggestions.length > 0 
+        ? `You are a movie discovery assistant. The user is asking for movie recommendations. I've found ${movieSuggestions.length} movies from TMDB that match their request. Respond conversationally about the suggestions and encourage them to add interesting movies to their collection. Keep responses under 100 words.`
+        : `You are a movie recommendation assistant for Jaq's curated collection. Here are the available movies:
 
 ${movieContext.slice(0, 10).map(movie => 
   `"${movie.title}" (${movie.rating || 'No rating'}/10)${movie.jaqNotes ? ` - ${movie.jaqNotes}` : ''}${movie.genres ? ` Genres: ${movie.genres.join(', ')}` : ''}`
 ).join('\n')}
 
 Help users discover movies from this collection. Be conversational and provide specific recommendations. If asking for a genre like sci-fi, look for relevant movies and recommend them. Keep responses under 150 words.`
+
+      const response = await openai.chat.completions.create({
+        model: 'gpt-4o-mini', // Use the faster, cheaper model
+        messages: [
+          {
+            role: 'system',
+            content: systemPrompt
           },
           {
             role: 'user',
@@ -117,6 +223,7 @@ Help users discover movies from this collection. Be conversational and provide s
       
       return NextResponse.json({
         response: aiResponse,
+        movieSuggestions: movieSuggestions,
         status: 'completed'
       })
       
