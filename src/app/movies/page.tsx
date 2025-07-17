@@ -8,6 +8,7 @@ import MovieCard from '../../components/MovieCard'
 import Hero from '../../components/Hero'
 import ScrollIndicator from '../../components/ScrollIndicator'
 import MovieDetailsModal from '../../components/MovieDetailsModal'
+import UserPrompt from '../../components/UserPrompt'
 
 interface MovieDetails {
   id: string | number
@@ -60,13 +61,10 @@ function MoviesContent() {
       const response = await fetch('/api/movies')
       const data = await response.json()
       
-      console.log('Movies API response:', data)
-      console.log('Movies count:', data.results?.length || 0)
       
       if (data.success) {
         setMovies(data.results || [])
         setError(null)
-        console.log('Movies loaded successfully:', data.results?.length || 0)
       } else {
         setError(data.error || 'Failed to load movies')
         setMovies([])
@@ -175,28 +173,6 @@ function MoviesContent() {
             {loading ? 'Loading...' : `${filteredMovies.length} of ${movies.length} movies`}
           </p>
 
-          {/* Debug info - remove after fixing */}
-          {!loading && (
-            <div style={{
-              background: 'var(--bg-secondary)',
-              padding: 'var(--spacing-md)',
-              borderRadius: 'var(--border-radius)',
-              marginBottom: 'var(--spacing-lg)',
-              color: 'var(--text-primary)',
-              fontSize: 'var(--font-size-sm)'
-            }}>
-              <strong>Debug Info:</strong><br/>
-              Total movies loaded: {movies.length}<br/>
-              Filtered movies: {filteredMovies.length}<br/>
-              Search query: &quot;{searchQuery}&quot;<br/>
-              {movies.length > 0 && (
-                <>
-                  First movie: {movies[0]?.title || 'N/A'}<br/>
-                  Sample movie IDs: {movies.slice(0, 3).map(m => m.id).join(', ')}
-                </>
-              )}
-            </div>
-          )}
 
           {!loading && movies.length > 0 && (
             <div style={{ 
@@ -377,6 +353,9 @@ function MoviesContent() {
           Loading movie details...
         </div>
       )}
+
+      {/* User Identification */}
+      <UserPrompt />
     </div>
   )
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
+import { useUser } from '../contexts/UserContext'
 
 interface StreamingProvider {
   provider_id: number
@@ -64,6 +65,10 @@ export default function MovieDetailsModal({ movie, isOpen, onClose, onSelectMovi
   const [isWatched, setIsWatched] = useState<boolean>(false)
   const [addingMovies, setAddingMovies] = useState<Set<number>>(new Set())
   const [addedMovies, setAddedMovies] = useState<Set<number>>(new Set())
+  const [userActionsLoading, setUserActionsLoading] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const { userId } = useUser()
   // Handle escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -83,6 +88,92 @@ export default function MovieDetailsModal({ movie, isOpen, onClose, onSelectMovi
       document.body.style.overflow = 'unset'
     }
   }, [isOpen, onClose])
+
+  // Load user actions when modal opens
+  useEffect(() => {
+    if (isOpen && movie && userId) {
+      loadUserActions()
+    } else {
+      // Reset to defaults when modal closes or no user
+      setPersonalRating(0)
+      setIsWatchlisted(false)
+      setIsWatched(false)
+    }
+  }, [isOpen, movie, userId])
+
+  const loadUserActions = async () => {
+    if (!movie || !userId) return
+
+    try {
+      setUserActionsLoading(true)
+      const response = await fetch(`/api/users/${encodeURIComponent(userId)}/actions/${movie.id}`)
+      const data = await response.json()
+
+      if (data.success) {
+        const userAction = data.userAction
+        setPersonalRating(userAction.rating || 0)
+        setIsWatchlisted(userAction.isWatchlisted || false)
+        setIsWatched(userAction.isWatched || false)
+      }
+    } catch (error) {
+      console.error('Error loading user actions:', error)
+    } finally {
+      setUserActionsLoading(false)
+    }
+  }
+
+  const saveUserActions = async () => {
+    if (!movie || !userId) return
+
+    try {
+      const response = await fetch(`/api/users/${encodeURIComponent(userId)}/actions/${movie.id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          rating: personalRating || null,
+          isWatchlisted,
+          isWatched
+        }),
+      })
+
+      const data = await response.json()
+      if (!data.success) {
+        console.error('Failed to save user actions:', data.error)
+      }
+    } catch (error) {
+      console.error('Error saving user actions:', error)
+    }
+  }
+
+  const handleDeleteMovie = async () => {
+    if (!movie) return
+
+    try {
+      setDeleting(true)
+      const response = await fetch(`/api/movies/${movie.id}/delete`, {
+        method: 'DELETE',
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        console.log(`Successfully deleted "${movie.title}"`)
+        onClose() // Close modal
+        onMovieAdded?.() // Refresh the movie list
+        setShowDeleteConfirm(false)
+      } else {
+        console.error('Failed to delete movie:', data.error)
+        alert('Failed to delete movie. Please try again.')
+      }
+    } catch (error) {
+      console.error('Error deleting movie:', error)
+      alert('Error deleting movie. Please try again.')
+    } finally {
+      setDeleting(false)
+    }
+  }
 
   if (!isOpen || !movie) return null
 
@@ -241,7 +332,11 @@ export default function MovieDetailsModal({ movie, isOpen, onClose, onSelectMovi
                       <button
                         key={star}
                         className={`star-button ${star <= personalRating ? 'active' : ''}`}
-                        onClick={() => setPersonalRating(star)}
+                        onClick={() => {
+                          setPersonalRating(star)
+                          setTimeout(saveUserActions, 100) // Small delay to ensure state update
+                        }}
+                        disabled={userActionsLoading || !userId}
                       >
                         ⭐
                       </button>
@@ -249,7 +344,11 @@ export default function MovieDetailsModal({ movie, isOpen, onClose, onSelectMovi
                     {personalRating > 0 && (
                       <button
                         className="clear-rating"
-                        onClick={() => setPersonalRating(0)}
+                        onClick={() => {
+                          setPersonalRating(0)
+                          setTimeout(saveUserActions, 100)
+                        }}
+                        disabled={userActionsLoading || !userId}
                       >
                         Clear
                       </button>
@@ -260,17 +359,77 @@ export default function MovieDetailsModal({ movie, isOpen, onClose, onSelectMovi
                 <div className="status-buttons">
                   <button
                     className={`status-button ${isWatchlisted ? 'active' : ''}`}
-                    onClick={() => setIsWatchlisted(!isWatchlisted)}
+                    onClick={() => {
+                      setIsWatchlisted(!isWatchlisted)
+                      setTimeout(saveUserActions, 100)
+                    }}
+                    disabled={userActionsLoading || !userId}
                   >
                     {isWatchlisted ? '❤️ In Watchlist' : '🤍 Add to Watchlist'}
                   </button>
                   
                   <button
                     className={`status-button ${isWatched ? 'active' : ''}`}
-                    onClick={() => setIsWatched(!isWatched)}
+                    onClick={() => {
+                      setIsWatched(!isWatched)
+                      setTimeout(saveUserActions, 100)
+                    }}
+                    disabled={userActionsLoading || !userId}
                   >
                     {isWatched ? '✅ Watched' : '👁️ Mark as Watched'}
                   </button>
+                </div>
+
+                {/* Delete Movie Section */}
+                <div style={{ 
+                  marginTop: 'var(--spacing-xl)', 
+                  paddingTop: 'var(--spacing-lg)',
+                  borderTop: '1px solid rgba(255, 255, 255, 0.1)'
+                }}>
+                  {!showDeleteConfirm ? (
+                    <button
+                      className="status-button"
+                      onClick={() => setShowDeleteConfirm(true)}
+                      style={{
+                        background: 'linear-gradient(135deg, var(--error) 0%, #dc2626 100%)',
+                        borderColor: 'var(--error)',
+                        color: 'white'
+                      }}
+                    >
+                      🗑️ Remove from Collection
+                    </button>
+                  ) : (
+                    <div style={{ textAlign: 'center' }}>
+                      <p style={{ 
+                        color: 'var(--text-primary)', 
+                        marginBottom: 'var(--spacing-md)',
+                        fontSize: 'var(--font-size-sm)'
+                      }}>
+                        Are you sure you want to remove <strong>&quot;{movie.title}&quot;</strong> from your collection?
+                      </p>
+                      <div style={{ display: 'flex', gap: 'var(--spacing-md)', justifyContent: 'center' }}>
+                        <button
+                          className="status-button"
+                          onClick={handleDeleteMovie}
+                          disabled={deleting}
+                          style={{
+                            background: 'linear-gradient(135deg, var(--error) 0%, #dc2626 100%)',
+                            borderColor: 'var(--error)',
+                            color: 'white'
+                          }}
+                        >
+                          {deleting ? '🗑️ Deleting...' : '✅ Yes, Delete'}
+                        </button>
+                        <button
+                          className="status-button"
+                          onClick={() => setShowDeleteConfirm(false)}
+                          disabled={deleting}
+                        >
+                          ❌ Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 

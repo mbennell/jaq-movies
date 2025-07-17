@@ -34,6 +34,7 @@ model Movie {
 
   recommendations Recommendation[]
   conversations   Conversation[]
+  userActions     UserAction[]
 
   @@map("movies")
 }
@@ -68,6 +69,23 @@ model Conversation {
   movie     Movie?   @relation(fields: [movieId], references: [id])
 
   @@map("conversations")
+}
+
+model UserAction {
+  id            String   @id @default(cuid())
+  userId        String   // User identifier (name or session)
+  movieId       String   
+  rating        Int?     // 1-5 star rating
+  isWatchlisted Boolean  @default(false)
+  isWatched     Boolean  @default(false)
+  personalNotes String?  // Personal notes about the movie
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  movie         Movie    @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, movieId]) // One action per user per movie
+  @@map("user_actions")
 }
 
 enum MediaType {
