@@ -189,7 +189,7 @@ function MoviesContent() {
               <strong>Debug Info:</strong><br/>
               Total movies loaded: {movies.length}<br/>
               Filtered movies: {filteredMovies.length}<br/>
-              Search query: "{searchQuery}"<br/>
+              Search query: &quot;{searchQuery}&quot;<br/>
               {movies.length > 0 && (
                 <>
                   First movie: {movies[0]?.title || 'N/A'}<br/>
@@ -325,7 +325,7 @@ function MoviesContent() {
                 No Results Found
               </h3>
               <p>
-                No movies match your search for &quot;{searchQuery}&quot;
+                No movies match your search for &ldquo;{searchQuery}&rdquo;
               </p>
               <button 
                 onClick={() => setSearchQuery('')}
