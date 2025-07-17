@@ -7,7 +7,15 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 })
 
-async function searchSimilarMovies(userMessage: string): Promise<any[]> {
+interface TMDBMovie {
+  id: number
+  title: string
+  overview: string
+  poster_path: string | null
+  vote_average: number
+}
+
+async function searchSimilarMovies(userMessage: string): Promise<TMDBMovie[]> {
   const tmdbApiKey = process.env.TMDB_API_KEY
   if (!tmdbApiKey) {
     return []
@@ -82,7 +90,7 @@ async function searchSimilarMovies(userMessage: string): Promise<any[]> {
     
     // Return top 6 similar movies with good ratings and descriptions
     return similarData.results
-      .filter((movie: any) => movie.vote_average > 6.0 && movie.overview)
+      .filter((movie: TMDBMovie) => movie.vote_average > 6.0 && movie.overview)
       .slice(0, 6)
 
   } catch (error) {
@@ -162,7 +170,7 @@ export async function POST(request: NextRequest) {
                                   message.toLowerCase().includes('find') ||
                                   message.toLowerCase().includes('recommend')
 
-    let movieSuggestions = []
+    let movieSuggestions: TMDBMovie[] = []
     
     // If requesting similar movies, search TMDB
     if (isSimilarMovieRequest && process.env.TMDB_API_KEY) {

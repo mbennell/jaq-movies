@@ -169,7 +169,7 @@ export default function Navigation({ isTransparent = false }: NavigationProps) {
           </div>
         </button>
         <Link href="/">
-          <img src="/img/logo-jaq-movie.png" alt="Jaq Deep Cuts" className="site-logo" />
+          <Image src="/img/logo-jaq-movie.png" alt="Jaq Deep Cuts" className="site-logo" width={120} height={40} />
         </Link>
         <button 
           className="hamburger" 

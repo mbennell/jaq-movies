@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import Navigation from '../../components/Navigation'
-import Hero from '../../components/Hero'
 
 interface ChatMessage {
   type: 'user' | 'ai'
@@ -10,20 +10,7 @@ interface ChatMessage {
   timestamp: Date
 }
 
-interface Movie {
-  id: string
-  title: string
-  posterPath?: string
-  rating?: number
-}
 
-interface Recommendation {
-  id: string
-  recommendedBy: string
-  jaqNotes?: string
-  enthusiasmLevel: number
-  movie: Movie
-}
 
 export default function SimpleChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -35,8 +22,15 @@ export default function SimpleChatPage() {
   ])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [recommendations, setRecommendations] = useState<Recommendation[]>([])
-  const [movieSuggestions, setMovieSuggestions] = useState<any[]>([])
+  const [movieSuggestions, setMovieSuggestions] = useState<TMDBMovie[]>([])
+
+interface TMDBMovie {
+  id: number
+  title: string
+  overview: string
+  poster_path: string | null
+  vote_average: number
+}
 
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return
@@ -96,9 +90,7 @@ export default function SimpleChatPage() {
         setMovieSuggestions(data.movieSuggestions)
       }
 
-      if (data.suggestions) {
-        setRecommendations(data.suggestions)
-      }
+      // Remove unused recommendations handling
 
     } catch (error) {
       console.error('Chat error:', error)
@@ -174,8 +166,8 @@ export default function SimpleChatPage() {
             Ask me to find movies similar to your favorites, or discover something new!
           </p>
           <div className="chat-examples">
-            <span className="chat-example">Try: "Find something similar to Interstellar"</span>
-            <span className="chat-example">Or: "I want a sci-fi thriller like Arrival"</span>
+            <span className="chat-example">Try: &quot;Find something similar to Interstellar&quot;</span>
+            <span className="chat-example">Or: &quot;I want a sci-fi thriller like Arrival&quot;</span>
           </div>
         </div>
 
@@ -213,10 +205,12 @@ export default function SimpleChatPage() {
                   {movieSuggestions.map((movie, index) => (
                     <div key={index} className="movie-suggestion-card">
                       {movie.poster_path && (
-                        <img 
+                        <Image 
                           src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
                           alt={movie.title}
                           className="suggestion-poster"
+                          width={150}
+                          height={225}
                         />
                       )}
                       <div className="suggestion-content">
