@@ -339,15 +339,13 @@ function MoviesContent() {
 
           {/* Movies Grid */}
           {filteredMovies.length > 0 && (
-            <FadeInSection delay={200}>
-              <div id="movies-grid" className="movie-grid">
-                {filteredMovies.map((movie, index) => (
-                  <FadeInSection key={movie.id} delay={300 + (index * 50)}>
-                    <MovieCard movie={movie} onViewDetails={handleViewDetails} />
-                  </FadeInSection>
-                ))}
-              </div>
-            </FadeInSection>
+            <div id="movies-grid" className="movie-grid">
+              {filteredMovies.map((movie, index) => (
+                <div key={movie.id} style={{ opacity: 1 }}>
+                  <MovieCard movie={movie} onViewDetails={handleViewDetails} />
+                </div>
+              ))}
+            </div>
           )}
         </div>
       </div>
