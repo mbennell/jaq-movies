@@ -89,18 +89,6 @@ export default function MovieDetailsModal({ movie, isOpen, onClose, onSelectMovi
     }
   }, [isOpen, onClose])
 
-  // Load user actions when modal opens
-  useEffect(() => {
-    if (isOpen && movie && userId) {
-      loadUserActions()
-    } else {
-      // Reset to defaults when modal closes or no user
-      setPersonalRating(0)
-      setIsWatchlisted(false)
-      setIsWatched(false)
-    }
-  }, [isOpen, movie, userId, loadUserActions])
-
   const loadUserActions = useCallback(async () => {
     if (!movie || !userId) return
 
@@ -121,6 +109,18 @@ export default function MovieDetailsModal({ movie, isOpen, onClose, onSelectMovi
       setUserActionsLoading(false)
     }
   }, [movie, userId])
+
+  // Load user actions when modal opens
+  useEffect(() => {
+    if (isOpen && movie && userId) {
+      loadUserActions()
+    } else {
+      // Reset to defaults when modal closes or no user
+      setPersonalRating(0)
+      setIsWatchlisted(false)
+      setIsWatched(false)
+    }
+  }, [isOpen, movie, userId, loadUserActions])
 
   const saveUserActions = async () => {
     if (!movie || !userId) return
