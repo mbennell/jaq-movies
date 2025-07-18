@@ -4,7 +4,7 @@ import OpenAI from 'openai'
 
 const prisma = new PrismaClient()
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
+  apiKey: process.env.OPENAI_API_KEY?.trim()
 })
 
 interface TMDBMovie {
@@ -16,7 +16,7 @@ interface TMDBMovie {
 }
 
 async function searchSimilarMovies(userMessage: string): Promise<TMDBMovie[]> {
-  const tmdbApiKey = process.env.TMDB_API_KEY
+  const tmdbApiKey = process.env.TMDB_API_KEY?.trim()
   if (!tmdbApiKey) {
     console.log('TMDB API key not found in environment variables')
     return []
@@ -197,7 +197,7 @@ export async function POST(request: NextRequest) {
     let movieSuggestions: TMDBMovie[] = []
     
     // If requesting similar movies, search TMDB
-    if (isSimilarMovieRequest && process.env.TMDB_API_KEY) {
+    if (isSimilarMovieRequest && process.env.TMDB_API_KEY?.trim()) {
       console.log('Attempting TMDB search...')
       try {
         movieSuggestions = await searchSimilarMovies(message)
