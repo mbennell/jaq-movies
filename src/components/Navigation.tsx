@@ -47,7 +47,7 @@ export default function Navigation({ isTransparent = false }: NavigationProps) {
           right: 0,
           zIndex: 1000,
           height: 'var(--header-height)',
-          padding: 'var(--spacing-lg)',
+          padding: 'var(--spacing-sm) var(--spacing-lg)',
           transition: 'all var(--transition-normal)',
           borderBottom: !isTransparent || isScrolled ? '1px solid var(--bg-secondary)' : 'none'
         }}
@@ -66,10 +66,10 @@ export default function Navigation({ isTransparent = false }: NavigationProps) {
             }}
           >
             <Image
-              src="/img/logo-jaq-movie.png"
+              src="/img/new-logo.png"
               alt="Jaq Deep Cuts"
-              width={420}
-              height={140}
+              width={80}
+              height={32}
               className="nav-logo"
             />
           </Link>
@@ -169,7 +169,7 @@ export default function Navigation({ isTransparent = false }: NavigationProps) {
           </div>
         </button>
         <Link href="/">
-          <Image src="/img/logo-jaq-movie.png" alt="Jaq Deep Cuts" className="site-logo" width={120} height={40} />
+          <Image src="/img/new-logo.png" alt="Jaq Deep Cuts" className="site-logo" width={60} height={24} />
         </Link>
         <button 
           className="hamburger" 
