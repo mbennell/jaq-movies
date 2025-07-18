@@ -18,8 +18,11 @@ interface TMDBMovie {
 async function searchSimilarMovies(userMessage: string): Promise<TMDBMovie[]> {
   const tmdbApiKey = process.env.TMDB_API_KEY
   if (!tmdbApiKey) {
+    console.log('TMDB API key not found in environment variables')
     return []
   }
+  
+  console.log('TMDB API key found, searching for movies similar to:', userMessage)
 
   const tmdbHeaders = {
     'Authorization': `Bearer ${tmdbApiKey}`,
@@ -30,14 +33,20 @@ async function searchSimilarMovies(userMessage: string): Promise<TMDBMovie[]> {
     // Extract movie name from user message using simple patterns
     let movieName = ''
     
-    // Look for patterns like "similar to X" or "like X"
-    const similarMatch = userMessage.match(/similar to\s+([^,.!?]+)/i)
-    const likeMatch = userMessage.match(/like\s+([^,.!?]+)/i)
+    // Look for patterns like "similar to X" or "like X" - improved regex
+    const similarMatch = userMessage.match(/similar to\s+(.+?)(?:\s*[.!?]|$)/i)
+    const likeMatch = userMessage.match(/like\s+(.+?)(?:\s*[.!?]|$)/i)
+    
+    console.log('Checking message for patterns:', userMessage)
+    console.log('Similar match:', similarMatch)
+    console.log('Like match:', likeMatch)
     
     if (similarMatch) {
       movieName = similarMatch[1].trim()
+      console.log('Found movie name from similar pattern:', movieName)
     } else if (likeMatch) {
       movieName = likeMatch[1].trim()
+      console.log('Found movie name from like pattern:', movieName)
     } else {
       // Fallback: just search for popular movies in relevant genres
       const response = await fetch(
@@ -55,17 +64,18 @@ async function searchSimilarMovies(userMessage: string): Promise<TMDBMovie[]> {
     console.log('Searching TMDB for movies similar to:', movieName)
 
     // First, search for the movie they mentioned
-    const searchResponse = await fetch(
-      `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(movieName)}&page=1`,
-      { headers: tmdbHeaders }
-    )
+    const searchUrl = `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(movieName)}&page=1`
+    console.log('TMDB search URL:', searchUrl)
+    
+    const searchResponse = await fetch(searchUrl, { headers: tmdbHeaders })
 
     if (!searchResponse.ok) {
-      console.error('TMDB search failed:', searchResponse.statusText)
+      console.error('TMDB search failed:', searchResponse.status, searchResponse.statusText)
       return []
     }
 
     const searchData = await searchResponse.json()
+    console.log('TMDB search returned:', searchData.results?.length || 0, 'results')
     
     if (searchData.results.length === 0) {
       console.log('No movies found for:', movieName)
@@ -73,25 +83,29 @@ async function searchSimilarMovies(userMessage: string): Promise<TMDBMovie[]> {
     }
 
     const targetMovie = searchData.results[0]
-    console.log('Found target movie:', targetMovie.title)
+    console.log('Found target movie:', targetMovie.title, 'with ID:', targetMovie.id)
 
     // Get similar movies using TMDB's similar endpoint
-    const similarResponse = await fetch(
-      `https://api.themoviedb.org/3/movie/${targetMovie.id}/similar?page=1`,
-      { headers: tmdbHeaders }
-    )
+    const similarUrl = `https://api.themoviedb.org/3/movie/${targetMovie.id}/similar?page=1`
+    console.log('Fetching similar movies from:', similarUrl)
+    
+    const similarResponse = await fetch(similarUrl, { headers: tmdbHeaders })
 
     if (!similarResponse.ok) {
-      console.error('TMDB similar movies failed:', similarResponse.statusText)
+      console.error('TMDB similar movies failed:', similarResponse.status, similarResponse.statusText)
       return []
     }
 
     const similarData = await similarResponse.json()
+    console.log('TMDB similar movies returned:', similarData.results?.length || 0, 'results')
     
     // Return top 6 similar movies with good ratings and descriptions
-    return similarData.results
+    const filteredMovies = similarData.results
       .filter((movie: TMDBMovie) => movie.vote_average > 6.0 && movie.overview)
       .slice(0, 6)
+      
+    console.log('After filtering (rating > 6.0 and has overview):', filteredMovies.length, 'movies')
+    return filteredMovies
 
   } catch (error) {
     console.error('Error searching similar movies:', error)
