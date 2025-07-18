@@ -267,10 +267,17 @@ Help users discover movies from this collection. Be conversational and provide s
         message: openaiError instanceof Error ? openaiError.message : 'Unknown error',
         error: openaiError
       })
+      
+      // Even if OpenAI fails, return TMDB suggestions if we have them
+      const fallbackResponse = movieSuggestions.length > 0 
+        ? `I found ${movieSuggestions.length} movies similar to what you're looking for! Check out the suggestions below and add any that interest you to your collection.`
+        : "I'm having trouble with the AI right now. You can still browse movies in the Movies section!"
+      
       return NextResponse.json({
-        response: "I'm having trouble with the AI right now. You can still browse movies in the Movies section!",
+        response: fallbackResponse,
+        movieSuggestions: movieSuggestions, // Include TMDB suggestions even when OpenAI fails
         error: openaiError instanceof Error ? openaiError.message : 'Unknown OpenAI error',
-        status: 'error'
+        status: movieSuggestions.length > 0 ? 'completed' : 'error'
       }, { status: 200 })
     }
     
