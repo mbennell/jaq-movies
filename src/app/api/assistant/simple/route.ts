@@ -126,6 +126,10 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('Processing message:', message)
+    console.log('Environment check:')
+    console.log('- OPENAI_API_KEY present:', !!process.env.OPENAI_API_KEY)
+    console.log('- TMDB_API_KEY present:', !!process.env.TMDB_API_KEY)
+    console.log('- TMDB_API_KEY length:', process.env.TMDB_API_KEY?.length || 0)
     
     // Check if OpenAI is configured
     if (!process.env.OPENAI_API_KEY) {
@@ -136,6 +140,9 @@ export async function POST(request: NextRequest) {
         status: 'error'
       }, { status: 200 })
     }
+    
+    console.log('OpenAI API key found, checking TMDB API key...')
+    console.log('TMDB API key present:', !!process.env.TMDB_API_KEY)
     
     console.log('OpenAI API key found, proceeding with AI request')
     
@@ -184,16 +191,22 @@ export async function POST(request: NextRequest) {
                                   message.toLowerCase().includes('find') ||
                                   message.toLowerCase().includes('recommend')
 
+    console.log('Is similar movie request:', isSimilarMovieRequest)
+    console.log('User message:', message)
+
     let movieSuggestions: TMDBMovie[] = []
     
     // If requesting similar movies, search TMDB
     if (isSimilarMovieRequest && process.env.TMDB_API_KEY) {
+      console.log('Attempting TMDB search...')
       try {
         movieSuggestions = await searchSimilarMovies(message)
         console.log('Found', movieSuggestions.length, 'movie suggestions from TMDB')
       } catch (tmdbError) {
-        console.warn('TMDB search failed:', tmdbError)
+        console.error('TMDB search failed with error:', tmdbError)
       }
+    } else {
+      console.log('Skipping TMDB search - isSimilarMovieRequest:', isSimilarMovieRequest, 'TMDB_API_KEY present:', !!process.env.TMDB_API_KEY)
     }
 
     // Simple OpenAI chat completion
@@ -250,9 +263,13 @@ Help users discover movies from this collection. Be conversational and provide s
       })
       
     } catch (openaiError) {
-      console.error('OpenAI API error:', openaiError)
+      console.error('OpenAI API error details:', {
+        message: openaiError instanceof Error ? openaiError.message : 'Unknown error',
+        error: openaiError
+      })
       return NextResponse.json({
         response: "I'm having trouble with the AI right now. You can still browse movies in the Movies section!",
+        error: openaiError instanceof Error ? openaiError.message : 'Unknown OpenAI error',
         status: 'error'
       }, { status: 200 })
     }
