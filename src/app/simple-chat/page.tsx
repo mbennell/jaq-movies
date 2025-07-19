@@ -166,8 +166,9 @@ interface TMDBMovie {
             Ask me to find movies similar to your favorites, or discover something new!
           </p>
           <div className="chat-examples">
-            <span className="chat-example">Try: &quot;Find something similar to Interstellar&quot;</span>
-            <span className="chat-example">Or: &quot;I want a sci-fi thriller like Arrival&quot;</span>
+            <span className="chat-example">Try: &quot;Show me Black Panther&quot;</span>
+            <span className="chat-example">Or: &quot;Add Inception to my collection&quot;</span>
+            <span className="chat-example">Or: &quot;Find movies similar to Interstellar&quot;</span>
           </div>
         </div>
 
@@ -214,14 +215,31 @@ interface TMDBMovie {
                         />
                       )}
                       <div className="suggestion-content">
-                        <h4>{movie.title}</h4>
-                        <p className="suggestion-overview">{movie.overview}</p>
+                        <div className="suggestion-header">
+                          <h4 className="suggestion-title">{movie.title}</h4>
+                          {movie.vote_average > 0 && (
+                            <div className="suggestion-rating">
+                              ⭐ {movie.vote_average.toFixed(1)}
+                            </div>
+                          )}
+                        </div>
+                        <p className="suggestion-overview">
+                          {movie.overview.length > 150 
+                            ? `${movie.overview.substring(0, 150)}...` 
+                            : movie.overview}
+                        </p>
                         <div className="suggestion-actions">
                           <button 
                             className="btn btn-primary add-to-collection"
                             onClick={() => addMovieToCollection(movie.id)}
                           >
-                            Add to Collection
+                            ➕ Add to Collection
+                          </button>
+                          <button 
+                            className="btn btn-secondary view-details"
+                            onClick={() => window.open(`https://www.themoviedb.org/movie/${movie.id}`, '_blank')}
+                          >
+                            🔍 View Details
                           </button>
                         </div>
                       </div>
@@ -235,7 +253,7 @@ interface TMDBMovie {
             <div className="chat-input-container">
               <input
                 type="text"
-                placeholder="Ask me to find movies similar to your favorites..."
+                placeholder="Ask me to find movies, show specific films, or add movies to your collection..."
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={handleKeyPress}
