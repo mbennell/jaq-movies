@@ -490,7 +490,7 @@ p {
   text-decoration: none;
   font-weight: 600;
   font-size: var(--font-size-lg);
-  border-radius: 50px;
+  border-radius: 2px;
   transition: all var(--transition-normal);
   box-shadow: 0 4px 15px rgba(0, 102, 255, 0.3);
   border: 2px solid transparent;
