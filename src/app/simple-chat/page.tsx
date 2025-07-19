@@ -23,6 +23,7 @@ export default function SimpleChatPage() {
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [movieSuggestions, setMovieSuggestions] = useState<TMDBMovie[]>([])
+  const [movieStatuses, setMovieStatuses] = useState<Record<number, boolean>>({})
 
 interface TMDBMovie {
   id: number
@@ -31,6 +32,30 @@ interface TMDBMovie {
   poster_path: string | null
   vote_average: number
 }
+
+  const checkMovieStatuses = async (movies: TMDBMovie[]) => {
+    if (movies.length === 0) return
+    
+    try {
+      const response = await fetch('/api/movies/check-status', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          tmdbIds: movies.map(movie => movie.id)
+        }),
+      })
+      
+      const data = await response.json()
+      
+      if (data.success) {
+        setMovieStatuses(data.statusMap)
+      }
+    } catch (error) {
+      console.error('Error checking movie status:', error)
+    }
+  }
 
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return
@@ -88,6 +113,7 @@ interface TMDBMovie {
       // Handle movie suggestions from TMDB
       if (data.movieSuggestions) {
         setMovieSuggestions(data.movieSuggestions)
+        checkMovieStatuses(data.movieSuggestions)
       }
 
       // Remove unused recommendations handling
@@ -124,6 +150,12 @@ interface TMDBMovie {
           timestamp: new Date()
         }
         setMessages(prev => [...prev, successMessage])
+        
+        // Update the movie status to show it's now in collection
+        setMovieStatuses(prev => ({
+          ...prev,
+          [tmdbId]: true
+        }))
       } else {
         const errorMessage: ChatMessage = {
           type: 'ai',
@@ -229,12 +261,21 @@ interface TMDBMovie {
                             : movie.overview}
                         </p>
                         <div className="suggestion-actions">
-                          <button 
-                            className="btn btn-primary add-to-collection"
-                            onClick={() => addMovieToCollection(movie.id)}
-                          >
-                            ➕ Add to Collection
-                          </button>
+                          {movieStatuses[movie.id] ? (
+                            <button 
+                              className="btn btn-success already-added"
+                              disabled
+                            >
+                              ✅ In Collection
+                            </button>
+                          ) : (
+                            <button 
+                              className="btn btn-primary add-to-collection"
+                              onClick={() => addMovieToCollection(movie.id)}
+                            >
+                              ➕ Add to Collection
+                            </button>
+                          )}
                           <button 
                             className="btn btn-secondary view-details"
                             onClick={() => window.open(`https://www.themoviedb.org/movie/${movie.id}`, '_blank')}
