@@ -20,11 +20,12 @@ interface MovieDetails {
   vote_average: number
   runtime?: number
   genres?: { id: number; name: string }[]
-  cast?: { id: number; name: string; character: string; profile_path?: string }[]
+  cast?: { id: number; name: string; character: string; profile_path: string | null; order: number }[]
   crew?: { id: number; name: string; job: string }[]
   jaqNotes?: string
   enthusiasmLevel?: number
   streaming_providers?: {
+    link: string
     flatrate?: { provider_id: number; provider_name: string; logo_path: string }[]
     rent?: { provider_id: number; provider_name: string; logo_path: string }[]
     buy?: { provider_id: number; provider_name: string; logo_path: string }[]
