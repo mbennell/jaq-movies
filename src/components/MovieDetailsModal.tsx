@@ -3,6 +3,9 @@
 import { useEffect, useState, useCallback } from 'react'
 import Image from 'next/image'
 import { useUser } from '../contexts/UserContext'
+import UserScoreBadge from './UserScoreBadge'
+import WhereToWatch from './WhereToWatch'
+import CastCarousel from './CastCarousel'
 
 interface StreamingProvider {
   provider_id: number
@@ -26,6 +29,21 @@ interface SimilarMovie {
   release_date: string
 }
 
+interface WatchProvider {
+  link: string
+  flatrate?: StreamingProvider[]
+  rent?: StreamingProvider[]
+  buy?: StreamingProvider[]
+}
+
+interface CastMember {
+  id: number
+  name: string
+  character: string
+  profile_path: string | null
+  order: number
+}
+
 interface MovieDetails {
   id: string | number
   title: string
@@ -36,15 +54,11 @@ interface MovieDetails {
   vote_average: number
   runtime?: number
   genres?: { id: number; name: string }[]
-  cast?: { id: number; name: string; character: string; profile_path?: string }[]
+  cast?: CastMember[]
   crew?: { id: number; name: string; job: string }[]
   jaqNotes?: string
   enthusiasmLevel?: number
-  streaming_providers?: {
-    flatrate?: StreamingProvider[]
-    rent?: StreamingProvider[]
-    buy?: StreamingProvider[]
-  }
+  streaming_providers?: WatchProvider
   trailers?: Trailer[]
   similar_movies?: SimilarMovie[]
 }
@@ -283,24 +297,28 @@ export default function MovieDetailsModal({ movie, isOpen, onClose, onSelectMovi
               <h1 className="modal-title">{movie.title}</h1>
               
               <div className="modal-meta">
-                <span className="modal-year">{getYear(movie.release_date)}</span>
-                {movie.runtime && (
-                  <>
-                    <span className="modal-separator">•</span>
-                    <span className="modal-runtime">{getRuntime(movie.runtime)}</span>
-                  </>
-                )}
+                <div className="meta-row">
+                  <span className="modal-year">{getYear(movie.release_date)}</span>
+                  {movie.runtime && (
+                    <>
+                      <span className="modal-separator">•</span>
+                      <span className="modal-runtime">{getRuntime(movie.runtime)}</span>
+                    </>
+                  )}
+                  {movie.enthusiasmLevel && (
+                    <>
+                      <span className="modal-separator">•</span>
+                      <span className="modal-enthusiasm">{getEnthusiasmStars(movie.enthusiasmLevel)}</span>
+                    </>
+                  )}
+                </div>
                 {movie.vote_average > 0 && (
-                  <>
-                    <span className="modal-separator">•</span>
-                    <span className="modal-rating">⭐ {movie.vote_average.toFixed(1)}</span>
-                  </>
-                )}
-                {movie.enthusiasmLevel && (
-                  <>
-                    <span className="modal-separator">•</span>
-                    <span className="modal-enthusiasm">{getEnthusiasmStars(movie.enthusiasmLevel)}</span>
-                  </>
+                  <div className="score-section">
+                    <UserScoreBadge score={Math.round(movie.vote_average * 10)} size={60} />
+                    <div className="score-label">
+                      <span className="score-text">User Score</span>
+                    </div>
+                  </div>
                 )}
               </div>
 
@@ -440,108 +458,12 @@ export default function MovieDetailsModal({ movie, isOpen, onClose, onSelectMovi
             </div>
           </div>
 
-          {/* Streaming Providers */}
-          {movie.streaming_providers && (
-            <div className="streaming-section">
-              <h3>Where to Watch</h3>
-              
-              {movie.streaming_providers.flatrate && movie.streaming_providers.flatrate.length > 0 && (
-                <div className="streaming-category">
-                  <h4>Stream</h4>
-                  <div className="provider-list">
-                    {movie.streaming_providers.flatrate.map((provider) => (
-                      <div key={provider.provider_id} className="provider-item">
-                        <Image
-                          src={`https://image.tmdb.org/t/p/w45${provider.logo_path}`}
-                          alt={provider.provider_name}
-                          width={45}
-                          height={45}
-                          style={{ borderRadius: 'var(--border-radius)' }}
-                        />
-                        <span>{provider.provider_name}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+          {/* Where to Watch Section */}
+          <WhereToWatch watchProviders={movie.streaming_providers} />
 
-              {movie.streaming_providers.rent && movie.streaming_providers.rent.length > 0 && (
-                <div className="streaming-category">
-                  <h4>Rent</h4>
-                  <div className="provider-list">
-                    {movie.streaming_providers.rent.map((provider) => (
-                      <div key={provider.provider_id} className="provider-item">
-                        <Image
-                          src={`https://image.tmdb.org/t/p/w45${provider.logo_path}`}
-                          alt={provider.provider_name}
-                          width={45}
-                          height={45}
-                          style={{ borderRadius: 'var(--border-radius)' }}
-                        />
-                        <span>{provider.provider_name}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {movie.streaming_providers.buy && movie.streaming_providers.buy.length > 0 && (
-                <div className="streaming-category">
-                  <h4>Buy</h4>
-                  <div className="provider-list">
-                    {movie.streaming_providers.buy.map((provider) => (
-                      <div key={provider.provider_id} className="provider-item">
-                        <Image
-                          src={`https://image.tmdb.org/t/p/w45${provider.logo_path}`}
-                          alt={provider.provider_name}
-                          width={45}
-                          height={45}
-                          style={{ borderRadius: 'var(--border-radius)' }}
-                        />
-                        <span>{provider.provider_name}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div className="justwatch-attribution">
-                <p>Streaming data provided by <strong>JustWatch</strong></p>
-              </div>
-            </div>
-          )}
-
-          {/* Cast */}
+          {/* Cast Carousel */}
           {movie.cast && movie.cast.length > 0 && (
-            <div className="cast-section">
-              <h3>Cast</h3>
-              <div className="cast-list">
-                {movie.cast.slice(0, 8).map((actor) => (
-                  <div key={actor.id} className="cast-item">
-                    {actor.profile_path ? (
-                      <Image
-                        src={`https://image.tmdb.org/t/p/w185${actor.profile_path}`}
-                        alt={actor.name}
-                        width={80}
-                        height={120}
-                        style={{ 
-                          borderRadius: 'var(--border-radius)',
-                          objectFit: 'cover'
-                        }}
-                      />
-                    ) : (
-                      <div className="cast-placeholder">
-                        <span>👤</span>
-                      </div>
-                    )}
-                    <div className="cast-info">
-                      <p className="actor-name">{actor.name}</p>
-                      <p className="character-name">{actor.character}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <CastCarousel cast={movie.cast} />
           )}
 
 
