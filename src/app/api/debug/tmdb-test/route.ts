@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   const tmdbApiKey = process.env.TMDB_API_KEY?.trim()
   
   console.log('TMDB API Key check:')
