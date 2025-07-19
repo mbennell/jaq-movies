@@ -113,6 +113,53 @@ async function searchSimilarMovies(userMessage: string): Promise<TMDBMovie[]> {
   }
 }
 
+async function searchSpecificMovie(movieQuery: string): Promise<TMDBMovie[]> {
+  const tmdbApiKey = process.env.TMDB_API_KEY?.trim()
+  if (!tmdbApiKey) {
+    console.log('TMDB API key not found for specific movie search')
+    return []
+  }
+  
+  console.log('Searching TMDB for specific movie:', movieQuery)
+
+  const tmdbHeaders = {
+    'Authorization': `Bearer ${tmdbApiKey}`,
+    'Content-Type': 'application/json'
+  }
+
+  try {
+    const searchUrl = `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(movieQuery)}&page=1`
+    console.log('TMDB specific search URL:', searchUrl)
+    
+    const searchResponse = await fetch(searchUrl, { headers: tmdbHeaders })
+
+    if (!searchResponse.ok) {
+      console.error('TMDB specific search failed:', searchResponse.status, searchResponse.statusText)
+      return []
+    }
+
+    const searchData = await searchResponse.json()
+    console.log('TMDB specific search returned:', searchData.results?.length || 0, 'results')
+    
+    if (searchData.results.length === 0) {
+      console.log('No movies found for:', movieQuery)
+      return []
+    }
+
+    // Return top 3 most relevant movies
+    const topResults = searchData.results
+      .filter((movie: TMDBMovie) => movie.overview && movie.poster_path)
+      .slice(0, 3)
+      
+    console.log('After filtering (has overview and poster):', topResults.length, 'movies')
+    return topResults
+
+  } catch (error) {
+    console.error('Error searching specific movie:', error)
+    return []
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { message } = await request.json()
@@ -191,7 +238,14 @@ export async function POST(request: NextRequest) {
                                   message.toLowerCase().includes('find') ||
                                   message.toLowerCase().includes('recommend')
 
+    // Check if user is asking for a specific movie
+    const isSpecificMovieRequest = message.toLowerCase().includes('show me') ||
+                                   message.toLowerCase().includes('add') ||
+                                   message.toLowerCase().includes('display') ||
+                                   message.toLowerCase().includes('get')
+
     console.log('Is similar movie request:', isSimilarMovieRequest)
+    console.log('Is specific movie request:', isSpecificMovieRequest)
     console.log('User message:', message)
 
     let movieSuggestions: TMDBMovie[] = []
@@ -209,12 +263,53 @@ export async function POST(request: NextRequest) {
       console.log('Skipping TMDB search - isSimilarMovieRequest:', isSimilarMovieRequest, 'TMDB_API_KEY present:', !!process.env.TMDB_API_KEY)
     }
 
+    // Check for specific movie requests if no similar movies found yet
+    if (movieSuggestions.length === 0 && isSpecificMovieRequest && process.env.TMDB_API_KEY?.trim()) {
+      console.log('Attempting specific movie search...')
+      try {
+        // Extract movie name from the request
+        let movieQuery = ''
+        
+        // Try to extract movie name from various patterns
+        const showMeMatch = message.match(/show me (?:the movie )?(?:for )?(.+?)(?:\s*$|[.!?])/i)
+        const addMatch = message.match(/add (.+?)(?:\s+to|$)/i)
+        const displayMatch = message.match(/display (?:the movie )?(?:for )?(.+?)(?:\s*$|[.!?])/i)
+        const getMatch = message.match(/get (?:the movie )?(?:for )?(.+?)(?:\s*$|[.!?])/i)
+        
+        if (showMeMatch) {
+          movieQuery = showMeMatch[1].trim()
+        } else if (addMatch) {
+          movieQuery = addMatch[1].trim()
+        } else if (displayMatch) {
+          movieQuery = displayMatch[1].trim()
+        } else if (getMatch) {
+          movieQuery = getMatch[1].trim()
+        }
+        
+        // Clean up common suffixes
+        movieQuery = movieQuery.replace(/\s+(movie|film|to (?:the )?(?:database|collection))$/i, '').trim()
+        
+        console.log('Extracted movie query:', movieQuery)
+        
+        if (movieQuery) {
+          movieSuggestions = await searchSpecificMovie(movieQuery)
+          console.log('Found', movieSuggestions.length, 'specific movies from TMDB')
+        }
+      } catch (tmdbError) {
+        console.error('Specific movie search failed with error:', tmdbError)
+      }
+    } else if (isSpecificMovieRequest) {
+      console.log('Skipping specific movie search - movieSuggestions already found or TMDB_API_KEY missing')
+    }
+
     // Simple OpenAI chat completion
     try {
       console.log('Making OpenAI request with', movieContext.length, 'movies in context')
       
       const systemPrompt = movieSuggestions.length > 0 
-        ? `You are a movie discovery assistant. The user is asking for movie recommendations. I've found ${movieSuggestions.length} movies from TMDB that match their request. Respond conversationally about the suggestions and encourage them to add interesting movies to their collection. Keep responses under 100 words.`
+        ? (isSpecificMovieRequest 
+           ? `You are a movie discovery assistant. The user requested a specific movie and I found ${movieSuggestions.length} matching results from TMDB. Present the movie(s) I found and offer to add them to their collection. Be helpful and enthusiastic. Keep responses under 100 words.`
+           : `You are a movie discovery assistant. The user is asking for movie recommendations. I've found ${movieSuggestions.length} movies from TMDB that match their request. Respond conversationally about the suggestions and encourage them to add interesting movies to their collection. Keep responses under 100 words.`)
         : `You are a movie recommendation assistant for Jaq's curated collection. Here are the available movies:
 
 ${movieContext.slice(0, 10).map(movie => 
