@@ -24,6 +24,7 @@ export default function SimpleChatPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [movieSuggestions, setMovieSuggestions] = useState<TMDBMovie[]>([])
   const [movieStatuses, setMovieStatuses] = useState<Record<number, boolean>>({})
+  const [tmdbTestResult, setTmdbTestResult] = useState<string>('')
 
 interface TMDBMovie {
   id: number
@@ -32,6 +33,22 @@ interface TMDBMovie {
   poster_path: string | null
   vote_average: number
 }
+
+  const testTMDBConnectivity = async () => {
+    try {
+      setTmdbTestResult('Testing TMDB connectivity...')
+      const response = await fetch('/api/debug/tmdb-test')
+      const data = await response.json()
+      
+      if (data.success) {
+        setTmdbTestResult(`✅ TMDB works! Found ${data.resultsCount} results. First result: "${data.firstResult}"`)
+      } else {
+        setTmdbTestResult(`❌ TMDB failed: ${data.error || data.message}`)
+      }
+    } catch (error) {
+      setTmdbTestResult(`❌ TMDB test error: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    }
+  }
 
   const checkMovieStatuses = async (movies: TMDBMovie[]) => {
     if (movies.length === 0) return
@@ -201,6 +218,30 @@ interface TMDBMovie {
             <span className="chat-example">Try: &quot;Show me Black Panther&quot;</span>
             <span className="chat-example">Or: &quot;Add Inception to my collection&quot;</span>
             <span className="chat-example">Or: &quot;Find movies similar to Interstellar&quot;</span>
+          </div>
+          
+          {/* Debug Section */}
+          <div style={{ marginTop: 'var(--spacing-lg)', textAlign: 'center' }}>
+            <button 
+              onClick={testTMDBConnectivity}
+              className="btn btn-secondary"
+              style={{ fontSize: 'var(--font-size-sm)', padding: 'var(--spacing-xs) var(--spacing-md)' }}
+            >
+              🔧 Test TMDB Connection
+            </button>
+            {tmdbTestResult && (
+              <div style={{ 
+                marginTop: 'var(--spacing-sm)', 
+                padding: 'var(--spacing-sm)', 
+                background: tmdbTestResult.includes('✅') ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                border: tmdbTestResult.includes('✅') ? '1px solid rgba(34, 197, 94, 0.3)' : '1px solid rgba(239, 68, 68, 0.3)',
+                borderRadius: '2px',
+                fontSize: 'var(--font-size-sm)',
+                color: tmdbTestResult.includes('✅') ? '#22c55e' : '#ef4444'
+              }}>
+                {tmdbTestResult}
+              </div>
+            )}
           </div>
         </div>
 
