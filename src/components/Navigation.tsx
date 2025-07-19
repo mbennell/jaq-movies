@@ -68,8 +68,8 @@ export default function Navigation({ isTransparent = false }: NavigationProps) {
             <Image
               src="/img/new-logo.png"
               alt="Jaq Deep Cuts"
-              width={80}
-              height={32}
+              width={150}
+              height={60}
               className="nav-logo"
             />
           </Link>
@@ -169,7 +169,7 @@ export default function Navigation({ isTransparent = false }: NavigationProps) {
           </div>
         </button>
         <Link href="/">
-          <Image src="/img/new-logo.png" alt="Jaq Deep Cuts" className="site-logo" width={60} height={24} />
+          <Image src="/img/new-logo.png" alt="Jaq Deep Cuts" className="site-logo" width={100} height={40} />
         </Link>
         <button 
           className="hamburger" 

@@ -6,8 +6,8 @@
 
 :root {
   /* Header Height System */
-  --header-height: 60px;
-  --header-height-desktop: 80px;
+  --header-height: 70px;
+  --header-height-desktop: 100px;
   
   /* Modern Dark Palette */
   --bg-primary: #111111;
@@ -233,7 +233,7 @@ p {
 
 /* Logo responsive sizing */
 .nav-logo {
-  height: 32px;
+  height: 60px;
   width: auto;
   max-height: calc(var(--header-height) - 20px);
   object-fit: contain;
@@ -241,7 +241,7 @@ p {
 
 @media (max-width: 768px) {
   .nav-logo {
-    height: 24px;
+    height: 40px;
     width: auto;
   }
 }
@@ -263,7 +263,7 @@ p {
 }
 
 .site-logo {
-  height: 24px;
+  height: 40px;
   width: auto;
   max-height: calc(var(--header-height) - 20px);
   object-fit: contain;
@@ -422,7 +422,7 @@ p {
 
 @media (max-width: 480px) {
   .nav-logo {
-    height: 20px;
+    height: 32px;
     width: auto;
   }
   
