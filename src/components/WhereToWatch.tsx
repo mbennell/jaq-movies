@@ -112,14 +112,18 @@ export default function WhereToWatch({ watchProviders, region = 'US' }: WhereToW
 
         .providers-container {
           display: flex;
-          flex-direction: column;
-          gap: var(--spacing-md, 1rem);
+          flex-direction: row;
+          gap: var(--spacing-xl, 2rem);
+          align-items: flex-start;
+          flex-wrap: wrap;
         }
 
         .provider-section {
           display: flex;
           flex-direction: column;
           gap: var(--spacing-sm, 0.5rem);
+          min-width: 120px;
+          flex: 1;
         }
 
         .provider-section-title {
@@ -199,6 +203,15 @@ export default function WhereToWatch({ watchProviders, region = 'US' }: WhereToW
 
         /* Mobile responsive */
         @media (max-width: 768px) {
+          .providers-container {
+            flex-direction: column;
+            gap: var(--spacing-md, 1rem);
+          }
+          
+          .provider-section {
+            min-width: unset;
+          }
+          
           .provider-icons {
             gap: var(--spacing-xs, 0.25rem);
           }
