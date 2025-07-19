@@ -247,6 +247,7 @@ export async function POST(request: NextRequest) {
     console.log('Is similar movie request:', isSimilarMovieRequest)
     console.log('Is specific movie request:', isSpecificMovieRequest)
     console.log('User message:', message)
+    console.log('TMDB_API_KEY available:', !!process.env.TMDB_API_KEY?.trim())
 
     let movieSuggestions: TMDBMovie[] = []
     
@@ -266,6 +267,7 @@ export async function POST(request: NextRequest) {
     // Check for specific movie requests if no similar movies found yet
     if (movieSuggestions.length === 0 && isSpecificMovieRequest && process.env.TMDB_API_KEY?.trim()) {
       console.log('Attempting specific movie search...')
+      console.log('Conditions met: movieSuggestions.length =', movieSuggestions.length, 'isSpecificMovieRequest =', isSpecificMovieRequest, 'TMDB_API_KEY =', !!process.env.TMDB_API_KEY?.trim())
       try {
         // Extract movie name from the request
         let movieQuery = ''
@@ -275,6 +277,8 @@ export async function POST(request: NextRequest) {
         const addMatch = message.match(/add (.+?)(?:\s+to|$)/i)
         const displayMatch = message.match(/display (?:the movie )?(?:for )?(.+?)(?:\s*$|[.!?])/i)
         const getMatch = message.match(/get (?:the movie )?(?:for )?(.+?)(?:\s*$|[.!?])/i)
+        
+        console.log('Regex matches:', { showMeMatch, addMatch, displayMatch, getMatch })
         
         if (showMeMatch) {
           movieQuery = showMeMatch[1].trim()
@@ -292,8 +296,11 @@ export async function POST(request: NextRequest) {
         console.log('Extracted movie query:', movieQuery)
         
         if (movieQuery) {
+          console.log('Searching TMDB for extracted query:', movieQuery)
           movieSuggestions = await searchSpecificMovie(movieQuery)
-          console.log('Found', movieSuggestions.length, 'specific movies from TMDB')
+          console.log('Found', movieSuggestions.length, 'specific movies from TMDB for query:', movieQuery)
+        } else {
+          console.log('No movie query extracted from message:', message)
         }
       } catch (tmdbError) {
         console.error('Specific movie search failed with error:', tmdbError)
